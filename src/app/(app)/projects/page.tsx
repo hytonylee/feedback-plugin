@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { computePortfolioStats, type PortfolioStats } from "@/lib/portfolio-stats"
 import { getAllFeedback, listUserProjects } from "@/lib/sheets"
 import { AddMockDataButton } from "@/components/add-mock-data-button"
+import { RemoveAllProjectsButton } from "@/components/remove-all-projects-button"
 import { ProjectCardActions } from "@/components/project-card-actions"
 import { ProjectsPortfolioSummary } from "@/components/projects-portfolio-summary"
 import { RemoveProjectButton } from "@/components/remove-project-button"
@@ -45,19 +46,24 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FFD45A] text-[#2B1F0E] p-6">
+    <main className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Your projects</h1>
-            <p className="text-[#2B1F0E]/70 text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               Copy embed code, open the public form, or jump to the dashboard from each card.
             </p>
           </div>
           <div className="flex flex-wrap items-start justify-end gap-3">
-            {process.env.NODE_ENV === "development" ? <AddMockDataButton /> : null}
+            {process.env.NODE_ENV === "development" ? (
+              <>
+                <AddMockDataButton />
+                <RemoveAllProjectsButton projectCount={projects.length} />
+              </>
+            ) : null}
             <Link href="/setup">
-              <Button className="bg-[#FF5A5A] hover:bg-[#FF8B5A] text-[#2B1F0E]">
+              <Button className="bg-primary hover:bg-secondary text-primary-foreground">
                 Generate form
               </Button>
             </Link>
@@ -79,8 +85,8 @@ export default async function ProjectsPage() {
         )}
 
         {projects.length === 0 ? (
-          <Card className="bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
-            <CardContent className="py-10 text-[#2B1F0E]/70 text-sm">
+          <Card className="border border-border bg-card text-foreground">
+            <CardContent className="py-10 text-muted-foreground text-sm">
               No projects yet. Create your first project in setup.
             </CardContent>
           </Card>
@@ -90,12 +96,12 @@ export default async function ProjectsPage() {
               const sid = project.spreadsheetId
 
               return (
-                <Card key={project.projectId} className="bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
+                <Card key={project.projectId} className="border border-border bg-card text-foreground">
                   <CardHeader className="pb-2 space-y-0">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 space-y-1">
                         <CardTitle className="text-lg">{project.projectName}</CardTitle>
-                        <CardDescription className="text-[#2B1F0E]/70">
+                        <CardDescription className="text-muted-foreground">
                           projectId: <span className="font-mono">{project.projectId}</span>
                         </CardDescription>
                       </div>
@@ -105,7 +111,7 @@ export default async function ProjectsPage() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="border-[#FF8B5A] bg-[#FFD45A] text-[#2B1F0E] hover:bg-[#FF8B5A] hover:text-[#2B1F0E]"
+                            className="border-border bg-background text-foreground hover:bg-secondary hover:text-primary-foreground"
                           >
                             Edit form
                           </Button>

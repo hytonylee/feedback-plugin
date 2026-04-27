@@ -36,11 +36,11 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       error.message.toLowerCase().includes("quota exceeded")
     ) {
       return (
-        <div className="min-h-screen bg-[#FFD45A] text-[#2B1F0E]">
+        <div className="min-h-screen bg-background text-foreground">
           <div className="max-w-3xl mx-auto px-6 py-20">
-            <div className="rounded-xl border border-[#FF8B5A] bg-[#FFA95A]/50 p-6">
-              <h1 className="text-xl font-semibold text-[#FF5A5A]">Google Sheets quota reached</h1>
-              <p className="mt-2 text-[#2B1F0E]/80">
+            <div className="rounded-xl border border-border bg-card/50 p-6">
+              <h1 className="text-xl font-semibold text-primary">Google Sheets quota reached</h1>
+              <p className="mt-2 text-muted-foreground">
                 Your dashboard is getting rate-limited by the Google Sheets API. Wait about a
                 minute and refresh.
               </p>
@@ -56,21 +56,21 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const priorities = computePriority(rows)
 
   return (
-    <div className="min-h-screen bg-[#FFD45A] text-[#2B1F0E]">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#2B1F0E]">{project.projectName}</h1>
-            <p className="text-[#2B1F0E]/70 text-sm mt-1">{rows.length} submissions total</p>
+            <h1 className="text-2xl font-bold text-foreground">{project.projectName}</h1>
+            <p className="text-muted-foreground text-sm mt-1">{rows.length} submissions total</p>
           </div>
-          <Badge variant="outline" className="border-[#FF8B5A] text-[#2B1F0E]/70 font-mono text-xs">
+          <Badge variant="outline" className="border-border text-muted-foreground font-mono text-xs">
             {projectId}
           </Badge>
         </div>
 
         {rows.length === 0 ? (
-          <div className="rounded-xl border border-[#FF8B5A] bg-[#FFA95A] py-20 text-center text-[#2B1F0E]/70">
-            <p className="text-lg font-medium text-[#2B1F0E]">No feedback yet</p>
+          <div className="rounded-xl border border-border bg-card py-20 text-center text-muted-foreground">
+            <p className="text-lg font-medium text-foreground">No feedback yet</p>
             <p className="text-sm mt-1">Share your form link to start collecting responses.</p>
           </div>
         ) : (

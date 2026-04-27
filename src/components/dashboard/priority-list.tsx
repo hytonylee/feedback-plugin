@@ -11,7 +11,7 @@ export default function PriorityList({ items }: { items: PriorityItem[] }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-1.5">
-        <h2 className="text-sm font-medium text-[#2B1F0E]/70 uppercase tracking-wider">
+        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
           Priority ranking
         </h2>
         <PriorityScoreHintIcon />
@@ -20,31 +20,31 @@ export default function PriorityList({ items }: { items: PriorityItem[] }) {
         {items.map((item, i) => (
           <div
             key={item.category}
-            className="rounded-xl border border-[#FF8B5A] bg-[#FFA95A] p-4 space-y-3"
+            className="rounded-xl border border-border bg-card p-4 space-y-3"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-[#2B1F0E]/60 text-sm font-mono w-5">#{i + 1}</span>
-                <span className="font-medium text-[#2B1F0E]">{item.category}</span>
+                <span className="text-muted-foreground text-sm font-mono w-5">#{i + 1}</span>
+                <span className="font-medium text-foreground">{item.category}</span>
                 {item.recentCount > 0 && (
-                  <Badge className="bg-[#FF5A5A]/20 text-[#FF5A5A] border-[#FF8B5A] text-xs">
+                  <Badge className="bg-primary/20 text-primary border-border text-xs">
                     +{item.recentCount} this week
                   </Badge>
                 )}
               </div>
               <div className="text-right">
-                <span className="text-[#2B1F0E] font-semibold">{item.count}</span>
-                <span className="text-[#2B1F0E]/60 text-sm ml-1">responses</span>
+                <span className="text-foreground font-semibold">{item.count}</span>
+                <span className="text-muted-foreground text-sm ml-1">responses</span>
               </div>
             </div>
             <Progress
               value={(item.score / maxScore) * 100}
-              className="h-1.5 bg-[#FFD45A] [&>div]:bg-[#FF5A5A]"
+              className="h-1.5 bg-muted [&>div]:bg-primary"
             />
             {item.topTags.length > 0 && (
               <div className="flex gap-1.5">
                 {item.topTags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="border-[#FF8B5A] text-[#2B1F0E]/70 text-xs">
+                  <Badge key={tag} variant="outline" className="border-border text-muted-foreground text-xs">
                     #{tag}
                   </Badge>
                 ))}

@@ -64,10 +64,10 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
 
   if (status === "error" && !project) {
     return (
-      <Card className="w-full max-w-md bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
+      <Card className="w-full max-w-md border border-border bg-card text-foreground">
         <CardContent className="py-12 text-center space-y-2">
-          <p className="font-medium text-[#2B1F0E]">Unable to load this form</p>
-          <p className="text-sm text-[#2B1F0E]/70">Please confirm you are signed in and try again.</p>
+          <p className="font-medium text-foreground">Unable to load this form</p>
+          <p className="text-sm text-muted-foreground">Please confirm you are signed in and try again.</p>
         </CardContent>
       </Card>
     )
@@ -75,19 +75,19 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
 
   if (!project) {
     return (
-      <Card className="w-full max-w-md bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
-        <CardContent className="py-12 text-center text-[#2B1F0E]/70">Loading…</CardContent>
+      <Card className="w-full max-w-md border border-border bg-card text-foreground">
+        <CardContent className="py-12 text-center text-muted-foreground">Loading…</CardContent>
       </Card>
     )
   }
 
   if (status === "done") {
     return (
-      <Card className="w-full max-w-md bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
+      <Card className="w-full max-w-md border border-border bg-card text-foreground">
         <CardContent className="py-12 text-center space-y-2">
           <div className="text-3xl">✓</div>
-          <p className="font-medium text-[#2B1F0E]">{preview ? "Preview looks great!" : "Feedback received!"}</p>
-          <p className="text-sm text-[#2B1F0E]/70">
+          <p className="font-medium text-foreground">{preview ? "Preview looks great!" : "Feedback received!"}</p>
+          <p className="text-sm text-muted-foreground">
             {preview ? "This was a preview — no data was saved." : "Thanks for helping us improve."}
           </p>
         </CardContent>
@@ -96,31 +96,31 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
   }
 
   return (
-    <Card className="w-full max-w-md bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
+    <Card className="w-full max-w-md border border-border bg-card text-foreground">
       {preview && (
-        <div className="rounded-t-lg bg-[#FFD45A] border-b border-[#FF8B5A] px-4 py-2 flex items-center justify-between gap-2 text-xs text-[#FF5A5A]">
+        <div className="rounded-t-lg bg-background border-b border-border px-4 py-2 flex items-center justify-between gap-2 text-xs text-primary">
           <span>Preview mode — submissions will not be saved</span>
           {dashboardUrl && (
-            <a href={dashboardUrl} className="underline underline-offset-2 whitespace-nowrap hover:text-[#FF8B5A]">
+            <a href={dashboardUrl} className="underline underline-offset-2 whitespace-nowrap hover:text-secondary">
               ← Dashboard
             </a>
           )}
         </div>
       )}
       <CardHeader>
-        <CardTitle className="text-lg text-[#2B1F0E]">{project.projectName}</CardTitle>
-        <CardDescription className="text-[#2B1F0E]/70">Share your feedback with the team.</CardDescription>
+        <CardTitle className="text-lg text-foreground">{project.projectName}</CardTitle>
+        <CardDescription className="text-muted-foreground">Share your feedback with the team.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <Label className="text-[#2B1F0E]">Category</Label>
+          <Label className="text-foreground">Category</Label>
           <Select onValueChange={(v: string | null) => setCategory(v ?? "")}>
-            <SelectTrigger className="bg-[#FFD45A] border-[#FF8B5A] text-[#2B1F0E]">
+            <SelectTrigger className="bg-background border-border text-foreground">
               <SelectValue placeholder="What type of feedback?" />
             </SelectTrigger>
-            <SelectContent className="bg-[#FFA95A] border-[#FF8B5A]">
+            <SelectContent className="border border-border bg-card">
               {project.categories.map((c) => (
-                <SelectItem key={c} value={c} className="text-[#2B1F0E] focus:bg-[#FFD45A]">
+                <SelectItem key={c} value={c} className="text-foreground focus:bg-background">
                   {c}
                 </SelectItem>
               ))}
@@ -130,9 +130,9 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
 
         {project.tags.length > 0 && (
           <div className="space-y-2">
-            <Label className="text-[#2B1F0E]">
+            <Label className="text-foreground">
               Tags{" "}
-              <span className="text-[#2B1F0E]/60 font-normal">
+              <span className="text-muted-foreground font-normal">
                 ({project.requirements.tagsRequired ? "required" : "optional"})
               </span>
             </Label>
@@ -143,8 +143,8 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
                   variant={selectedTags.includes(tag) ? "default" : "outline"}
                   className={`cursor-pointer transition-colors ${
                     selectedTags.includes(tag)
-                      ? "bg-[#FF5A5A] hover:bg-[#FF8B5A] text-[#2B1F0E] border-[#FF5A5A]"
-                      : "border-[#FF8B5A] text-[#2B1F0E]/70 hover:border-[#FF5A5A]"
+                      ? "bg-primary hover:bg-secondary text-primary-foreground border-primary"
+                      : "border-border text-muted-foreground hover:border-primary"
                   }`}
                   onClick={() => toggleTag(tag)}
                 >
@@ -153,15 +153,15 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
               ))}
             </div>
             {project.requirements.tagsRequired && selectedTags.length === 0 && (
-              <p className="text-xs text-[#FF5A5A]">Select at least one tag.</p>
+              <p className="text-xs text-primary">Select at least one tag.</p>
             )}
           </div>
         )}
 
         <div className="space-y-2">
-          <Label className="text-[#2B1F0E]">
+          <Label className="text-foreground">
             Comment{" "}
-            <span className="text-[#2B1F0E]/60 font-normal">
+            <span className="text-muted-foreground font-normal">
               ({project.requirements.commentRequired ? "required" : "optional"})
             </span>
           </Label>
@@ -169,16 +169,16 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
             placeholder="Tell us more…"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="bg-[#FFD45A] border-[#FF8B5A] text-[#2B1F0E] placeholder:text-[#2B1F0E]/50 resize-none"
+            className="bg-background border-border text-foreground placeholder:text-muted-foreground resize-none"
             rows={3}
           />
           {project.requirements.commentRequired && !comment.trim() && (
-            <p className="text-xs text-[#FF5A5A]">Comment is required.</p>
+            <p className="text-xs text-primary">Comment is required.</p>
           )}
         </div>
 
         <Button
-          className="w-full bg-[#FF5A5A] hover:bg-[#FF8B5A] text-[#2B1F0E]"
+          className="w-full bg-primary hover:bg-secondary text-primary-foreground"
           disabled={!canSubmit}
           onClick={handleSubmit}
         >

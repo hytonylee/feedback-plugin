@@ -3,14 +3,14 @@ import { signOut } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 
 const navLinkClass =
-  "text-sm font-medium text-[#2B1F0E]/80 hover:text-[#2B1F0E] transition-colors"
+  "text-sm font-medium text-secondary-foreground/85 hover:text-primary-foreground transition-colors"
 
 export async function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[#FF5A5A]/60 bg-[#FF8B5A]/95 backdrop-blur supports-backdrop-filter:bg-[#FF8B5A]/88">
+    <header className="sticky top-0 z-50 border-b border-primary/30 bg-secondary/95 backdrop-blur supports-backdrop-filter:bg-secondary/90">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-4">
         <nav className="flex items-center gap-6">
-          <Link href="/" className="text-sm font-semibold text-[#2B1F0E]">
+          <Link href="/" className="text-sm font-semibold text-primary-foreground">
             📋 Feedback Plugin
           </Link>
           <Link href="/setup" className={navLinkClass}>
@@ -30,7 +30,7 @@ export async function SiteHeader() {
             type="submit"
             variant="outline"
             size="sm"
-            className="border-[#FF8B5A] bg-[#FFA95A] text-[#2B1F0E] hover:bg-[#FF8B5A] hover:text-[#2B1F0E]"
+            className="border-secondary-foreground/35 bg-transparent text-secondary-foreground hover:bg-primary/25 hover:border-primary-foreground/40 hover:text-primary-foreground"
           >
             Log out
           </Button>

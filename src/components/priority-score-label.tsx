@@ -7,14 +7,14 @@ import { PRIORITY_SCORE_DESCRIPTION } from "@/lib/priority"
 import { cn } from "@/lib/utils"
 
 const popupClassName = cn(
-  "max-w-[min(18rem,calc(100vw-1.5rem))] rounded-md border border-[#FF8B5A] bg-[#FFD45A] px-3 py-2 text-left",
-  "text-xs leading-snug text-[#2B1F0E] shadow-md",
+  "max-w-[min(18rem,calc(100vw-1.5rem))] rounded-md border border-border bg-background px-3 py-2 text-left",
+  "text-xs leading-snug text-foreground shadow-md",
   "origin-(--transform-origin) transition-[transform,opacity] data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0"
 )
 
 const triggerClassName = cn(
-  "inline-flex size-6 shrink-0 items-center justify-center rounded-md text-[#2B1F0E]/45",
-  "outline-none transition-colors hover:text-[#2B1F0E]/75 focus-visible:ring-2 focus-visible:ring-[#FF5A5A]/50"
+  "inline-flex size-6 shrink-0 items-center justify-center rounded-md text-foreground/45",
+  "outline-none transition-colors hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50"
 )
 
 function PriorityScoreTooltipPopup({ align }: { align: "start" | "end" }) {
@@ -52,7 +52,7 @@ export function PriorityScoreLabel({ className }: LabelProps) {
   return (
     <Tooltip.Root>
       <div className={cn("flex items-center justify-end gap-1", className)}>
-        <p className="text-xs text-[#2B1F0E]/60">Priority score</p>
+        <p className="text-xs text-muted-foreground">Priority score</p>
         <Tooltip.Trigger
           delay={150}
           type="button"

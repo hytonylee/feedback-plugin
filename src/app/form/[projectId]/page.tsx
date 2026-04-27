@@ -15,7 +15,7 @@ export default async function FormPage({ params, searchParams }: Props) {
   const isPreview = preview === "1"
 
   return (
-    <div className="min-h-screen bg-[#FFD45A] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <FeedbackForm
         projectId={projectId}
         spreadsheetId={spreadsheetId}

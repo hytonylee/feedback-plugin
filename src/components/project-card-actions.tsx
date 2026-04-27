@@ -6,7 +6,7 @@ import { useCallback, useState } from "react"
 import { Button } from "@/components/ui/button"
 
 const outlineCard =
-  "border-[#FF8B5A] bg-[#FFD45A] text-[#2B1F0E] hover:bg-[#FF8B5A] hover:text-[#2B1F0E]"
+  "border-border bg-background text-foreground hover:bg-secondary hover:text-primary-foreground"
 
 type Props = {
   projectId: string
@@ -15,8 +15,10 @@ type Props = {
 
 export function ProjectCardActions({ projectId, spreadsheetId }: Props) {
   const [copiedEmbed, setCopiedEmbed] = useState(false)
+  const [copiedPreviewLink, setCopiedPreviewLink] = useState(false)
 
   const formHref = `/form/${projectId}?sid=${spreadsheetId}`
+  const previewFormHref = `${formHref}&preview=1`
   const dashboardHref = `/dashboard/${projectId}?sid=${spreadsheetId}`
 
   const copyEmbedScript = useCallback(() => {
@@ -26,6 +28,13 @@ export function ProjectCardActions({ projectId, spreadsheetId }: Props) {
     setCopiedEmbed(true)
     setTimeout(() => setCopiedEmbed(false), 2000)
   }, [formHref])
+
+  const copyPreviewFormLink = useCallback(() => {
+    const origin = window.location.origin
+    void navigator.clipboard.writeText(`${origin}${previewFormHref}`)
+    setCopiedPreviewLink(true)
+    setTimeout(() => setCopiedPreviewLink(false), 2000)
+  }, [previewFormHref])
 
   return (
     <div className="flex flex-wrap gap-2 pt-1">
@@ -38,11 +47,21 @@ export function ProjectCardActions({ projectId, spreadsheetId }: Props) {
       >
         {copiedEmbed ? "Copied!" : "Copy embed script"}
       </Button>
-      <Button variant="outline" size="sm" className={outlineCard} nativeButton={false} render={<Link href={formHref} target="_blank" rel="noopener noreferrer" />}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className={outlineCard}
+        onClick={copyPreviewFormLink}
+        title="Copy URL that opens the form in preview mode (submissions not saved)"
+      >
+        {copiedPreviewLink ? "Copied!" : "Copy preview link"}
+      </Button>
+      <Button variant="outline" size="sm" className={outlineCard} nativeButton={false} render={<Link href={previewFormHref} target="_blank" rel="noopener noreferrer" />}>
         Form preview
       </Button>
       <Button variant="outline" size="sm" className={outlineCard} nativeButton={false} render={<Link href={dashboardHref} />}>
-        Dashboard
+        Form dashboard
       </Button>
     </div>
   )

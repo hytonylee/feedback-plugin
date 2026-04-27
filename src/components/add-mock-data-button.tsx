@@ -33,11 +33,11 @@ export function AddMockDataButton() {
         onClick={handleClick}
         disabled={loading}
         title="Creates sample Google Sheets projects with fake submissions (localhost only)"
-        className="border-[#8B4513]/35 bg-[#FFD45A] text-[#2B1F0E] hover:bg-[#FF8B5A]/35"
+        className="border-primary/35 bg-background text-foreground hover:bg-primary/15"
       >
         {loading ? "Adding…" : "Add mock data"}
       </Button>
-      <span className="text-[10px] font-medium uppercase tracking-wide text-[#2B1F0E]/55">
+      <span className="text-[10px] font-medium uppercase tracking-wide text-foreground/55">
         Dev only
       </span>
       {error ? <span className="text-xs text-red-900 max-w-56 text-right">{error}</span> : null}
