@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,7 +15,19 @@ interface DoneState {
   spreadsheetId: string
 }
 
-export default function SetupWizard() {
+type Props = {
+  editProjectId?: string
+  editSpreadsheetId?: string
+}
+
+export default function SetupWizard({
+  editProjectId,
+  editSpreadsheetId,
+}: Props = {}) {
+  const isEditIntent = Boolean(editProjectId && editSpreadsheetId)
+  const [bootError, setBootError] = useState<string | null>(null)
+  const [booting, setBooting] = useState(isEditIntent)
+
   const [step, setStep] = useState<Step>("name")
   const [projectName, setProjectName] = useState("")
   const [categories, setCategories] = useState<string[]>(["Bug Report", "Feature Request", "Improvement", "Question"])
@@ -31,6 +43,47 @@ export default function SetupWizard() {
   const [done, setDone] = useState<DoneState | null>(null)
   const [copied, setCopied] = useState(false)
 
+  useEffect(() => {
+    const pid = editProjectId
+    const sid = editSpreadsheetId
+    if (!pid || !sid) return
+
+    let cancelled = false
+    async function load(projectId: string, spreadsheetId: string) {
+      setBootError(null)
+      setBooting(true)
+      try {
+        const res = await fetch(
+          `/api/project/${encodeURIComponent(projectId)}?sid=${encodeURIComponent(spreadsheetId)}`
+        )
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          throw new Error(typeof data?.error === "string" ? data.error : "Could not load project")
+        }
+        if (cancelled) return
+        setProjectName(data.projectName ?? "")
+        setCategories(Array.isArray(data.categories) ? data.categories : [])
+        setTags(Array.isArray(data.tags) ? data.tags : [])
+        if (data.requirements && typeof data.requirements === "object") {
+          setRequirements({
+            tagsRequired: Boolean(data.requirements.tagsRequired),
+            commentRequired: Boolean(data.requirements.commentRequired),
+          })
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setBootError(e instanceof Error ? e.message : "Could not load project")
+        }
+      } finally {
+        if (!cancelled) setBooting(false)
+      }
+    }
+    void load(pid, sid)
+    return () => {
+      cancelled = true
+    }
+  }, [editProjectId, editSpreadsheetId])
+
   const addCategory = () => {
     const val = catInput.trim()
     if (val && !categories.includes(val)) setCategories([...categories, val])
@@ -43,21 +96,42 @@ export default function SetupWizard() {
     setTagInput("")
   }
 
-  const handleCreate = async () => {
+  const handleSubmit = async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch("/api/setup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectName, categories, tags, requirements }),
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setDone(data)
-        setStep("done")
+      if (isEditIntent && editProjectId && editSpreadsheetId) {
+        const res = await fetch(
+          `/api/project/${encodeURIComponent(editProjectId)}?sid=${encodeURIComponent(editSpreadsheetId)}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ projectName, categories, tags, requirements }),
+          }
+        )
+        const data = await res.json().catch(() => ({}))
+        if (res.ok) {
+          setDone({
+            projectId: editProjectId,
+            spreadsheetId: editSpreadsheetId,
+          })
+          setStep("done")
+        } else {
+          setError(data?.error ?? "Failed to save changes. Please try again.")
+        }
       } else {
-        setError(data?.error ?? "Failed to create form. Please try again.")
+        const res = await fetch("/api/setup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectName, categories, tags, requirements }),
+        })
+        const data = await res.json()
+        if (res.ok) {
+          setDone(data)
+          setStep("done")
+        } else {
+          setError(data?.error ?? "Failed to create form. Please try again.")
+        }
       }
     } catch {
       setError("Could not reach the server. Please check your connection and try again.")
@@ -76,15 +150,53 @@ export default function SetupWizard() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  if (booting) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <Card className="w-full max-w-lg bg-slate-900 border-slate-700 text-white">
+          <CardContent className="py-12 text-center text-slate-400 text-sm">
+            Loading project…
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (bootError) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <Card className="w-full max-w-lg bg-slate-900 border-slate-700 text-white">
+          <CardHeader>
+            <CardTitle className="text-xl">Could not open project</CardTitle>
+            <CardDescription className="text-slate-400">{bootError}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <a href="/projects">
+              <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
+                Back to your projects
+              </Button>
+            </a>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const editing = isEditIntent
+
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
       <Card className="w-full max-w-lg bg-slate-900 border-slate-700 text-white">
         {step === "name" && (
           <>
             <CardHeader>
-              <CardTitle className="text-xl">Name your project</CardTitle>
+              <CardTitle className="text-xl">
+                {editing ? "Update your project" : "Name your project"}
+              </CardTitle>
               <CardDescription className="text-slate-400">
-                This is what your team will see on the dashboard.
+                {editing
+                  ? "Change the name or continue to update categories, tags, and form rules."
+                  : "This is what your team will see on the dashboard."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -240,10 +352,16 @@ export default function SetupWizard() {
                 </Button>
                 <Button
                   className="flex-1 bg-violet-600 hover:bg-violet-500"
-                  onClick={handleCreate}
+                  onClick={handleSubmit}
                   disabled={loading}
                 >
-                  {loading ? "Creating…" : "Create form →"}
+                  {loading
+                    ? editing
+                      ? "Saving…"
+                      : "Creating…"
+                    : editing
+                      ? "Save changes →"
+                      : "Create form →"}
                 </Button>
               </div>
             </CardContent>
@@ -254,9 +372,13 @@ export default function SetupWizard() {
           <>
             <CardHeader>
               <div className="text-2xl mb-1">🎉</div>
-              <CardTitle className="text-xl">Your form is ready</CardTitle>
+              <CardTitle className="text-xl">
+                {editing ? "Changes saved" : "Your form is ready"}
+              </CardTitle>
               <CardDescription className="text-slate-400">
-                Copy the embed code below and paste it anywhere on your site.
+                {editing
+                  ? "Your form and dashboard links are unchanged. Copy the embed code again if you need it."
+                  : "Copy the embed code below and paste it anywhere on your site."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

@@ -110,6 +110,46 @@ export async function createProjectSheet(
   return spreadsheetId
 }
 
+/** Updates config row B–D and F; preserves projectId (A) and createdAt (E). Optionally renames the Drive file. */
+export async function updateProjectConfig(
+  accessToken: string,
+  spreadsheetId: string,
+  updates: Pick<Project, "projectName" | "categories" | "tags" | "requirements">
+): Promise<void> {
+  const sheets = getSheetsClient(accessToken)
+  const drive = getDriveClient(accessToken)
+
+  await sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      valueInputOption: "RAW",
+      data: [
+        {
+          range: "config!B2:D2",
+          values: [
+            [
+              updates.projectName,
+              JSON.stringify(updates.categories),
+              JSON.stringify(updates.tags),
+            ],
+          ],
+        },
+        {
+          range: "config!F2",
+          values: [[JSON.stringify(updates.requirements)]],
+        },
+      ],
+    },
+  })
+
+  await withRetry(() =>
+    drive.files.update({
+      fileId: spreadsheetId,
+      requestBody: { name: `Feedback: ${updates.projectName}` },
+    })
+  )
+}
+
 export async function getProjectConfig(
   accessToken: string,
   spreadsheetId: string
