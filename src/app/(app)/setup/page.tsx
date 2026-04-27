@@ -4,6 +4,6 @@ import SetupWizard from "@/components/setup/wizard"
 
 export default async function SetupPage() {
   const session = await auth()
-  if (!session) redirect("/")
+  if (!session) redirect("/login")
   return <SetupWizard />
 }

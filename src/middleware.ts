@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server"
+import { NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import {
   demoGateCookieName,
   demoGateEnabled,
@@ -6,28 +7,51 @@ import {
   verifyDemoGateToken,
 } from "@/lib/demo-gate"
 
-export async function middleware(request: NextRequest) {
-  if (!demoGateEnabled()) {
-    return NextResponse.next()
-  }
-
-  const { pathname } = request.nextUrl
-
-  if (isDemoGatePublicPath(pathname)) {
-    return NextResponse.next()
-  }
-
-  const token = request.cookies.get(demoGateCookieName())?.value
-  if (await verifyDemoGateToken(token)) {
-    return NextResponse.next()
-  }
-
-  const loginUrl = new URL("/demo-access", request.url)
-  const callback = `${pathname}${request.nextUrl.search}`
-  loginUrl.searchParams.set("callbackUrl", callback || "/")
-
-  return NextResponse.redirect(loginUrl)
+function isAuthPublicPath(pathname: string): boolean {
+  if (pathname === "/login") return true
+  if (pathname.startsWith("/api/auth")) return true
+  if (pathname.startsWith("/form/")) return true
+  if (pathname.startsWith("/api/project/")) return true
+  if (pathname.startsWith("/api/feedback/")) return true
+  if (pathname === "/demo-access") return true
+  if (pathname.startsWith("/api/demo-access")) return true
+  return false
 }
+
+export default auth(async (req) => {
+  const pathname = req.nextUrl.pathname
+
+  if (demoGateEnabled()) {
+    if (!isDemoGatePublicPath(pathname)) {
+      const token = req.cookies.get(demoGateCookieName())?.value
+      if (!(await verifyDemoGateToken(token))) {
+        const loginUrl = new URL("/demo-access", req.url)
+        const callback = `${pathname}${req.nextUrl.search}`
+        loginUrl.searchParams.set("callbackUrl", callback || "/")
+        return NextResponse.redirect(loginUrl)
+      }
+    }
+  }
+
+  if (isAuthPublicPath(pathname)) {
+    if (pathname === "/login" && req.auth) {
+      return NextResponse.redirect(new URL("/", req.url))
+    }
+    return NextResponse.next()
+  }
+
+  if (!req.auth) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+    const loginUrl = new URL("/login", req.url)
+    const callback = `${pathname}${req.nextUrl.search}`
+    loginUrl.searchParams.set("callbackUrl", callback || "/")
+    return NextResponse.redirect(loginUrl)
+  }
+
+  return NextResponse.next()
+})
 
 export const config = {
   matcher: [

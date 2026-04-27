@@ -13,7 +13,7 @@ interface Props {
 
 export default async function DashboardPage({ params, searchParams }: Props) {
   const session = await auth()
-  if (!session) redirect("/")
+  if (!session) redirect("/login")
 
   const { projectId } = await params
   const { sid: spreadsheetId } = await searchParams

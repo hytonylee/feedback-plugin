@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 
 export default async function ProjectsPage() {
   const session = await auth()
-  if (!session?.accessToken) redirect("/")
+  if (!session?.accessToken) redirect("/login")
 
   const projects = await listUserProjects(session.accessToken)
 

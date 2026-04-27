@@ -93,6 +93,8 @@ export function timingSafeEqualStr(a: string, b: string): boolean {
  */
 export function isDemoGatePublicPath(pathname: string): boolean {
   if (pathname === "/demo-access") return true
+  /** NextAuth OAuth + session endpoints must not be blocked by demo gate. */
+  if (pathname.startsWith("/api/auth")) return true
   if (pathname.startsWith("/form/")) return true
   if (pathname.startsWith("/api/project/")) return true
   if (pathname.startsWith("/api/feedback/")) return true
