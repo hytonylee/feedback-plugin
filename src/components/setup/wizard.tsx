@@ -389,11 +389,18 @@ export default function SetupWizard({
                 {copied ? "Copied!" : "Copy embed code"}
               </Button>
               <Separator className="bg-slate-700" />
-              <a href={`/dashboard/${done.projectId}?sid=${done.spreadsheetId}`}>
-                <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
-                  Go to dashboard →
-                </Button>
-              </a>
+              <div className="flex flex-col gap-2">
+                <a href={`/form/${done.projectId}?sid=${done.spreadsheetId}&preview=1`} target="_blank" rel="noreferrer">
+                  <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
+                    Preview form
+                  </Button>
+                </a>
+                <a href={`/dashboard/${done.projectId}?sid=${done.spreadsheetId}`}>
+                  <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
+                    Go to dashboard →
+                  </Button>
+                </a>
+              </div>
             </CardContent>
           </>
         )}
