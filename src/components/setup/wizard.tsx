@@ -46,7 +46,8 @@ export default function SetupWizard({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState<DoneState | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [copiedEmbed, setCopiedEmbed] = useState(false)
+  const [copiedDistribution, setCopiedDistribution] = useState(false)
 
   useEffect(() => {
     if (!editProjectId || !editSpreadsheetId) return
@@ -163,10 +164,20 @@ export default function SetupWizard({
     ? `<iframe src="${window.location.origin}/form/${done.projectId}?sid=${done.spreadsheetId}" width="100%" height="520" frameborder="0" style="border-radius:12px"></iframe>`
     : ""
 
+  const distributionUrl = done
+    ? `${window.location.origin}/form/${done.projectId}?sid=${done.spreadsheetId}`
+    : ""
+
   const copyEmbed = () => {
     navigator.clipboard.writeText(embedCode)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setCopiedEmbed(true)
+    setTimeout(() => setCopiedEmbed(false), 2000)
+  }
+
+  const copyDistributionLink = () => {
+    navigator.clipboard.writeText(distributionUrl)
+    setCopiedDistribution(true)
+    setTimeout(() => setCopiedDistribution(false), 2000)
   }
 
   return (
@@ -402,17 +413,40 @@ export default function SetupWizard({
               </CardTitle>
               <CardDescription className="text-muted-foreground">
                 {isEditMode
-                  ? "Your form settings were updated. Copy the embed code below if you need it."
-                  : "Copy the embed code below and paste it anywhere on your site."}
+                  ? "Embed the form on a page, or share the public link with anyone — both save submissions to your sheet."
+                  : "Embed the form on your site, or share the public link with external respondents (email, Slack, social). Both use the same live form."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg bg-background p-3 text-xs text-foreground font-mono break-all border border-border">
-                {embedCode}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-foreground">Embed on your site</p>
+                <div className="rounded-lg bg-background p-3 text-xs text-foreground font-mono break-all border border-border">
+                  {embedCode}
+                </div>
+                <Button className="w-full bg-primary hover:bg-secondary text-primary-foreground" onClick={copyEmbed}>
+                  {copiedEmbed ? "Copied!" : "Copy embed code"}
+                </Button>
               </div>
-              <Button className="w-full bg-primary hover:bg-secondary text-primary-foreground" onClick={copyEmbed}>
-                {copied ? "Copied!" : "Copy embed code"}
-              </Button>
+
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-foreground">Distributed form link</p>
+                <p className="text-xs text-muted-foreground">
+                  Same form as the embed — share with people who are not on your website. Submissions are saved.
+                </p>
+                <div className="rounded-lg bg-background p-3 text-xs text-foreground font-mono break-all border border-border">
+                  {distributionUrl}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-border text-foreground hover:bg-background"
+                  onClick={copyDistributionLink}
+                  title="Copy the public form URL to share with respondents"
+                >
+                  {copiedDistribution ? "Copied!" : "Copy distribution link"}
+                </Button>
+              </div>
+
               <Separator className="bg-border" />
               <div className="flex flex-col gap-2">
                 <a href={`/form/${done.projectId}?sid=${done.spreadsheetId}&preview=1`} target="_blank" rel="noreferrer">
