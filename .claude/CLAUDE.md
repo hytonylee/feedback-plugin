@@ -65,3 +65,17 @@ Before building a new feature: `/office-hours` → `/plan-eng-review`
 Before writing UI: `/design-consultation` → `/design-html`
 Before shipping: `/review` → `/ship`
 To QA a flow: `/qa`
+
+## Project Workflow Rules
+
+When working on this project, follow these rules:
+
+1. **Always start new feature or bug work on a new branch**
+   - Do not start feature/bug work directly on `main`.
+   - Create a dedicated branch before making any code changes.
+   - Use clear branch names (for example: `feature/add-dashboard-filters`, `fix/form-validation-error`).
+
+2. **Every commit must include relevant information**
+   - Commit messages must explain what changed and why.
+   - Keep commits focused and meaningful so reviewers can follow the history.
+   - Avoid vague messages like `update` or `fix stuff`.
