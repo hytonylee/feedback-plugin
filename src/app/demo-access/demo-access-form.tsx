@@ -52,7 +52,7 @@ export default function DemoAccessForm() {
       className="mx-auto w-full min-w-0 max-w-full space-y-6 text-center"
     >
       <div className="space-y-2">
-        <Label htmlFor="demo-user" className="flex w-full justify-center text-slate-300">
+        <Label htmlFor="demo-user" className="flex w-full justify-center text-[#2B1F0E]/85">
           Demo username
         </Label>
         <Input
@@ -61,12 +61,12 @@ export default function DemoAccessForm() {
           autoComplete="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="box-border w-full min-w-0 max-w-full bg-slate-800 border-slate-600 text-white"
+          className="box-border w-full min-w-0 max-w-full bg-[#FFD45A] border-[#FF8B5A] text-[#2B1F0E]"
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="demo-pass" className="flex w-full justify-center text-slate-300">
+        <Label htmlFor="demo-pass" className="flex w-full justify-center text-[#2B1F0E]/85">
           Demo password
         </Label>
         <Input
@@ -76,14 +76,14 @@ export default function DemoAccessForm() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="box-border w-full min-w-0 max-w-full bg-slate-800 border-slate-600 text-white"
+          className="box-border w-full min-w-0 max-w-full bg-[#FFD45A] border-[#FF8B5A] text-[#2B1F0E]"
           required
         />
       </div>
       {error ? <p className="text-center text-sm text-red-400">{error}</p> : null}
       <Button
         type="submit"
-        className="box-border w-full min-w-0 max-w-full bg-violet-600 hover:bg-violet-500 text-white"
+        className="box-border w-full min-w-0 max-w-full bg-[#FF5A5A] hover:bg-[#FF8B5A] text-[#2B1F0E]"
         disabled={pending}
       >
         {pending ? "Signing in…" : "Continue to app"}

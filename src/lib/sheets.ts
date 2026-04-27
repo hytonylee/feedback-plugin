@@ -176,11 +176,12 @@ export async function getProjectConfig(
   }
 }
 
-export async function appendFeedback(
+export async function appendFeedbackBatch(
   accessToken: string,
   spreadsheetId: string,
-  row: FeedbackRow
+  rows: FeedbackRow[]
 ) {
+  if (rows.length === 0) return
   const sheets = getSheetsClient(accessToken)
   await sheets.spreadsheets.values.append({
     spreadsheetId,
@@ -188,11 +189,23 @@ export async function appendFeedback(
     valueInputOption: "RAW",
     insertDataOption: "INSERT_ROWS",
     requestBody: {
-      values: [
-        [row.timestamp, row.category, row.tags.join(","), row.comment, row.sessionId],
-      ],
+      values: rows.map((row) => [
+        row.timestamp,
+        row.category,
+        row.tags.join(","),
+        row.comment,
+        row.sessionId,
+      ]),
     },
   })
+}
+
+export async function appendFeedback(
+  accessToken: string,
+  spreadsheetId: string,
+  row: FeedbackRow
+) {
+  await appendFeedbackBatch(accessToken, spreadsheetId, [row])
 }
 
 export async function getAllFeedback(

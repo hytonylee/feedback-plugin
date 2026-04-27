@@ -11,7 +11,7 @@ import {
 } from "recharts"
 import type { FeedbackRow, PriorityItem } from "@/types"
 
-const COLORS = ["#733906", "#8A4508", "#A55010", "#D9A76A", "#C4B898"]
+const COLORS = ["#FF5A5A", "#FF8B5A", "#FFA95A", "#FFD45A", "#2B1F0E"]
 
 interface Props {
   rows: FeedbackRow[]
@@ -37,8 +37,8 @@ export default function FeedbackCharts({ rows, priorities }: Props) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="rounded-xl border border-[#5C4520] bg-[#40331C] p-5 space-y-4">
-        <h3 className="text-sm font-medium text-[#A5A6A4] uppercase tracking-wider">
+      <div className="rounded-xl border border-[#FF8B5A] bg-[#FFA95A] p-5 space-y-4">
+        <h3 className="text-sm font-medium text-[#2B1F0E]/70 uppercase tracking-wider">
           Feedback by category
         </h3>
         <ResponsiveContainer width="100%" height={220}>
@@ -48,14 +48,14 @@ export default function FeedbackCharts({ rows, priorities }: Props) {
               type="category"
               dataKey="name"
               width={120}
-              tick={{ fill: "#A5A6A4", fontSize: 12 }}
+              tick={{ fill: "#2B1F0E", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip
-              contentStyle={{ background: "#40331C", border: "1px solid #5C4520", borderRadius: 8 }}
-              labelStyle={{ color: "#D9CCB4" }}
-              itemStyle={{ color: "#D9A76A" }}
+              contentStyle={{ background: "#FFA95A", border: "1px solid #FF8B5A", borderRadius: 8 }}
+              labelStyle={{ color: "#2B1F0E" }}
+              itemStyle={{ color: "#FF5A5A" }}
             />
             <Bar dataKey="count" radius={[0, 4, 4, 0]}>
               {categoryData.map((_, i) => (
@@ -66,12 +66,12 @@ export default function FeedbackCharts({ rows, priorities }: Props) {
         </ResponsiveContainer>
       </div>
 
-      <div className="rounded-xl border border-[#5C4520] bg-[#40331C] p-5 space-y-4">
-        <h3 className="text-sm font-medium text-[#A5A6A4] uppercase tracking-wider">
+      <div className="rounded-xl border border-[#FF8B5A] bg-[#FFA95A] p-5 space-y-4">
+        <h3 className="text-sm font-medium text-[#2B1F0E]/70 uppercase tracking-wider">
           Top tags
         </h3>
         {tagData.length === 0 ? (
-          <div className="flex items-center justify-center h-[220px] text-[#7A7A78] text-sm">
+          <div className="flex items-center justify-center h-[220px] text-[#2B1F0E]/60 text-sm">
             No tags used yet
           </div>
         ) : (
@@ -82,16 +82,16 @@ export default function FeedbackCharts({ rows, priorities }: Props) {
                 type="category"
                 dataKey="name"
                 width={100}
-                tick={{ fill: "#A5A6A4", fontSize: 12 }}
+                tick={{ fill: "#2B1F0E", fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{ background: "#40331C", border: "1px solid #5C4520", borderRadius: 8 }}
-                labelStyle={{ color: "#D9CCB4" }}
-                itemStyle={{ color: "#D9A76A" }}
+                contentStyle={{ background: "#FFA95A", border: "1px solid #FF8B5A", borderRadius: 8 }}
+                labelStyle={{ color: "#2B1F0E" }}
+                itemStyle={{ color: "#FF5A5A" }}
               />
-              <Bar dataKey="count" fill="#D9A76A" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="count" fill="#FF5A5A" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

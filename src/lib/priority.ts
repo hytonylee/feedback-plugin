@@ -1,5 +1,9 @@
 import type { FeedbackRow, PriorityItem } from "@/types"
 
+/** Shown in UI tooltips — keep aligned with `computePriority` below. */
+export const PRIORITY_SCORE_DESCRIPTION =
+  "Priority score ranks categories by combining total responses (weight 1), how many distinct tags appear (weight 0.5 each), and responses from the last 7 days (weight 0.3 each). Higher scores rise to the top."
+
 export function computePriority(rows: FeedbackRow[]): PriorityItem[] {
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
   const byCategory = new Map<string, FeedbackRow[]>()

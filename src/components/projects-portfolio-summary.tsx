@@ -1,6 +1,7 @@
 import type { PriorityItem } from "@/types"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PriorityScoreLabel } from "@/components/priority-score-label"
 
 type Props = {
   projectCount: number
@@ -23,8 +24,8 @@ export function ProjectsPortfolioSummary({
 }: Props) {
   if (quotaExceeded) {
     return (
-      <Card className="bg-amber-950/30 border-amber-700/40 text-white">
-        <CardContent className="py-4 text-sm text-amber-100/90">
+      <Card className="bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
+        <CardContent className="py-4 text-sm text-[#2B1F0E]/80">
           Could not load portfolio stats (Google Sheets quota). Wait about a minute and refresh.
         </CardContent>
       </Card>
@@ -32,58 +33,58 @@ export function ProjectsPortfolioSummary({
   }
 
   const statClass =
-    "rounded-lg border border-slate-800 bg-slate-900/80 px-4 py-3 text-center sm:text-left"
+    "rounded-lg border border-[#FF8B5A] bg-[#FFD45A] px-4 py-3 text-center sm:text-left"
 
   return (
-    <Card className="bg-slate-900 border-slate-800 text-white">
+    <Card className="bg-[#FFA95A] border-[#FF8B5A] text-[#2B1F0E]">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-slate-100">
+        <CardTitle className="text-base font-semibold text-[#2B1F0E]">
           Across all projects
         </CardTitle>
-        <p className="text-xs text-slate-500 font-normal">
+        <p className="text-xs text-[#2B1F0E]/60 font-normal">
           Combined feedback from every project below.
         </p>
       </CardHeader>
       <CardContent className="space-y-4 pt-0">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className={statClass}>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Total submissions</p>
+            <p className="text-xs uppercase tracking-wide text-[#2B1F0E]/60">Total submissions</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">{totalSubmissions}</p>
           </div>
           <div className={statClass}>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Last 7 days</p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums text-violet-300">
+            <p className="text-xs uppercase tracking-wide text-[#2B1F0E]/60">Last 7 days</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-[#FF5A5A]">
               {recentSubmissions}
             </p>
           </div>
           <div className={statClass}>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Projects with feedback</p>
+            <p className="text-xs uppercase tracking-wide text-[#2B1F0E]/60">Projects with feedback</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">
               {projectsWithFeedback}
-              <span className="text-slate-500 text-base font-normal"> / {projectCount}</span>
+              <span className="text-[#2B1F0E]/60 text-base font-normal"> / {projectCount}</span>
             </p>
           </div>
           <div className={statClass}>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Active categories</p>
+            <p className="text-xs uppercase tracking-wide text-[#2B1F0E]/60">Active categories</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">{distinctCategories}</p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+        <div className="rounded-xl border border-[#FF8B5A] bg-[#FFD45A] p-4">
+          <p className="text-xs font-medium uppercase tracking-wider text-[#2B1F0E]/60">
             Current priority (portfolio)
           </p>
           {topPriority ? (
             <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2 min-w-0">
-                <p className="text-lg font-semibold text-white">{topPriority.category}</p>
-                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
+                <p className="text-lg font-semibold text-[#2B1F0E]">{topPriority.category}</p>
+                <div className="flex flex-wrap items-center gap-2 text-sm text-[#2B1F0E]/75">
                   <span>
-                    <span className="text-slate-300 font-medium">{topPriority.count}</span>{" "}
+                    <span className="text-[#2B1F0E] font-medium">{topPriority.count}</span>{" "}
                     responses
                   </span>
                   {topPriority.recentCount > 0 && (
-                    <Badge className="bg-violet-900/50 text-violet-300 border-violet-700 text-xs">
+                    <Badge className="bg-[#FF5A5A]/20 text-[#FF5A5A] border-[#FF8B5A] text-xs">
                       +{topPriority.recentCount} this week
                     </Badge>
                   )}
@@ -94,7 +95,7 @@ export function ProjectsPortfolioSummary({
                       <Badge
                         key={tag}
                         variant="outline"
-                        className="border-slate-700 text-slate-400 text-xs"
+                        className="border-[#FF8B5A] text-[#2B1F0E]/75 text-xs"
                       >
                         #{tag}
                       </Badge>
@@ -103,8 +104,8 @@ export function ProjectsPortfolioSummary({
                 )}
               </div>
               <div className="text-right shrink-0">
-                <p className="text-xs text-slate-500">Priority score</p>
-                <p className="text-xl font-mono font-semibold text-violet-400 tabular-nums">
+                <PriorityScoreLabel />
+                <p className="mt-0.5 text-xl font-mono font-semibold text-[#FF5A5A] tabular-nums">
                   {topPriority.score >= 10
                     ? topPriority.score.toFixed(1)
                     : topPriority.score.toFixed(2)}
@@ -112,7 +113,7 @@ export function ProjectsPortfolioSummary({
               </div>
             </div>
           ) : (
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-[#2B1F0E]/75">
               No feedback yet. Share form links from your projects to see portfolio priority here.
             </p>
           )}

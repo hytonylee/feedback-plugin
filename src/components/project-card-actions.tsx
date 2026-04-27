@@ -6,7 +6,7 @@ import { useCallback, useState } from "react"
 import { Button } from "@/components/ui/button"
 
 const outlineCard =
-  "border-slate-500 bg-slate-800 text-white hover:bg-slate-700 hover:text-white"
+  "border-[#FF8B5A] bg-[#FFD45A] text-[#2B1F0E] hover:bg-[#FF8B5A] hover:text-[#2B1F0E]"
 
 type Props = {
   projectId: string

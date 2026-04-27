@@ -17,45 +17,45 @@ export default function FeedbackCommentsTable({ rows }: { rows: FeedbackRow[] })
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-medium text-slate-400 uppercase tracking-wider">
+      <h2 className="text-sm font-medium text-[#2B1F0E]/70 uppercase tracking-wider">
         All comments
       </h2>
-      <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
+      <div className="rounded-xl border border-[#FF8B5A] bg-[#FFA95A] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/50 text-left">
-                <th scope="col" className="px-4 py-3 font-medium text-slate-400 whitespace-nowrap">
+              <tr className="border-b border-[#FF8B5A] bg-[#FFD45A]/60 text-left">
+                <th scope="col" className="px-4 py-3 font-medium text-[#2B1F0E]/70 whitespace-nowrap">
                   Submitted
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium text-slate-400 whitespace-nowrap">
+                <th scope="col" className="px-4 py-3 font-medium text-[#2B1F0E]/70 whitespace-nowrap">
                   Category
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium text-slate-400 min-w-[140px]">
+                <th scope="col" className="px-4 py-3 font-medium text-[#2B1F0E]/70 min-w-[140px]">
                   Tags
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium text-slate-400 min-w-[240px]">
+                <th scope="col" className="px-4 py-3 font-medium text-[#2B1F0E]/70 min-w-[240px]">
                   Comment
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-[#FF8B5A]">
               {sorted.map((row, i) => (
                 <tr key={`${row.sessionId}-${row.timestamp}-${i}`} className="align-top">
-                  <td className="px-4 py-3 text-slate-300 whitespace-nowrap tabular-nums">
+                  <td className="px-4 py-3 text-[#2B1F0E]/80 whitespace-nowrap tabular-nums">
                     {formatSubmittedAt(row.timestamp)}
                   </td>
-                  <td className="px-4 py-3 text-white font-medium">{row.category}</td>
+                  <td className="px-4 py-3 text-[#2B1F0E] font-medium">{row.category}</td>
                   <td className="px-4 py-3">
                     {row.tags.length === 0 ? (
-                      <span className="text-slate-600">—</span>
+                      <span className="text-[#2B1F0E]/50">—</span>
                     ) : (
                       <div className="flex flex-wrap gap-1.5">
                         {row.tags.map((tag) => (
                           <Badge
                             key={tag}
                             variant="outline"
-                            className="border-slate-700 text-slate-400 text-xs font-normal"
+                            className="border-[#FF8B5A] text-[#2B1F0E]/70 text-xs font-normal"
                           >
                             #{tag}
                           </Badge>
@@ -63,9 +63,9 @@ export default function FeedbackCommentsTable({ rows }: { rows: FeedbackRow[] })
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-slate-300 whitespace-pre-wrap break-words max-w-xl">
+                  <td className="px-4 py-3 text-[#2B1F0E]/80 whitespace-pre-wrap wrap-break-word max-w-xl">
                     {row.comment.trim() === "" ? (
-                      <span className="text-slate-600 italic">No comment</span>
+                      <span className="text-[#2B1F0E]/50 italic">No comment</span>
                     ) : (
                       row.comment
                     )}
