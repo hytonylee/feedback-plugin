@@ -208,3 +208,14 @@ export async function listUserProjects(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 }
+
+/** Moves the spreadsheet to the user's Google Drive trash (removes form + dashboard for this project). */
+export async function trashProjectSpreadsheet(accessToken: string, spreadsheetId: string) {
+  const drive = getDriveClient(accessToken)
+  await withRetry(() =>
+    drive.files.update({
+      fileId: spreadsheetId,
+      requestBody: { trashed: true },
+    })
+  )
+}

@@ -4,6 +4,7 @@ import { getProjectConfig, getAllFeedback } from "@/lib/sheets"
 import { computePriority } from "@/lib/priority"
 import PriorityList from "@/components/dashboard/priority-list"
 import FeedbackCharts from "@/components/dashboard/charts"
+import FeedbackCommentsTable from "@/components/dashboard/feedback-comments-table"
 import { Badge } from "@/components/ui/badge"
 
 interface Props {
@@ -76,6 +77,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
           <>
             <PriorityList items={priorities} />
             <FeedbackCharts rows={rows} priorities={priorities} />
+            <FeedbackCommentsTable rows={rows} />
           </>
         )}
       </div>

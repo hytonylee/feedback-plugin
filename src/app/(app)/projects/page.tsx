@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 
 import { auth } from "@/lib/auth"
 import { listUserProjects } from "@/lib/sheets"
+import { RemoveProjectButton } from "@/components/remove-project-button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -42,11 +43,20 @@ export default async function ProjectsPage() {
 
               return (
                 <Card key={project.projectId} className="bg-slate-900 border-slate-800 text-white">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{project.projectName}</CardTitle>
-                    <CardDescription className="text-slate-400">
-                      projectId: <span className="font-mono">{project.projectId}</span>
-                    </CardDescription>
+                  <CardHeader className="pb-2 space-y-0">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 space-y-1">
+                        <CardTitle className="text-lg">{project.projectName}</CardTitle>
+                        <CardDescription className="text-slate-400">
+                          projectId: <span className="font-mono">{project.projectId}</span>
+                        </CardDescription>
+                      </div>
+                      <RemoveProjectButton
+                        projectId={project.projectId}
+                        spreadsheetId={sid}
+                        projectName={project.projectName}
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
                     <div className="text-slate-300">

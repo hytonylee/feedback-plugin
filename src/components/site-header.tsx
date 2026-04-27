@@ -11,10 +11,7 @@ export async function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-4">
         <nav className="flex items-center gap-6">
           <Link href="/" className="text-sm font-semibold text-white">
-            Feedback
-          </Link>
-          <Link href="/" className={navLinkClass}>
-            Home
+            ⭐️ Feedback Plugin
           </Link>
           <Link href="/setup" className={navLinkClass}>
             Generate form
