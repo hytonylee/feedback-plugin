@@ -20,7 +20,12 @@ interface SetupWizardProps {
   editSpreadsheetId?: string
 }
 
-export default function SetupWizard(_props: SetupWizardProps) {
+export default function SetupWizard({
+  editProjectId,
+  editSpreadsheetId,
+}: SetupWizardProps) {
+  const isEditMode = Boolean(editProjectId && editSpreadsheetId)
+
   const [step, setStep] = useState<Step>("name")
   const [projectName, setProjectName] = useState("")
   const [categories, setCategories] = useState<string[]>(["Bug Report", "Feature Request", "Improvement", "Question"])
@@ -87,9 +92,13 @@ export default function SetupWizard(_props: SetupWizardProps) {
         {step === "name" && (
           <>
             <CardHeader>
-              <CardTitle className="text-xl text-foreground">Name your project</CardTitle>
+              <CardTitle className="text-xl text-foreground">
+                {isEditMode ? "Edit project" : "Name your project"}
+              </CardTitle>
               <CardDescription className="text-muted-foreground">
-                This is what your team will see on the dashboard.
+                {isEditMode
+                  ? "Rename your project or continue to update categories and tags."
+                  : "This is what your team will see on the dashboard."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
