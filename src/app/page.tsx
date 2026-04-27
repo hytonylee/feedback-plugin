@@ -6,18 +6,18 @@ export default async function Home() {
   const session = await auth()
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-950 to-slate-800 p-8 text-white">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#2B1F0E] to-[#40331C] p-8 text-[#D9CCB4]">
       <div className="max-w-2xl text-center space-y-6">
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-slate-300 border border-white/10">
+        <div className="inline-flex items-center gap-2 rounded-full bg-[#D9CCB4]/10 px-4 py-1.5 text-sm font-medium text-[#D9CCB4] border border-[#D9CCB4]/10">
           Product Feedback, Simplified
         </div>
         <h1 className="text-5xl font-bold tracking-tight">
           Understand what your users{" "}
-          <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#D9A76A] to-[#D9CCB4] bg-clip-text text-transparent">
             really want
           </span>
         </h1>
-        <p className="text-lg text-slate-400 max-w-lg mx-auto">
+        <p className="text-lg text-[#A5A6A4] max-w-lg mx-auto">
           Collect structured feedback, auto-sync to Google Sheets, and instantly see
           what your team should build next.
         </p>
@@ -25,7 +25,7 @@ export default async function Home() {
           {session ? (
             <>
               <Link href="/setup">
-                <Button size="lg" className="bg-violet-600 hover:bg-violet-500 text-white">
+                <Button size="lg" className="bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]">
                   Create your feedback form →
                 </Button>
               </Link>
@@ -33,7 +33,7 @@ export default async function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-slate-200 bg-slate-50 text-slate-950 hover:bg-white hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-violet-300"
+                  className="border-[#7A5D30] bg-[#40331C] text-[#D9CCB4] hover:bg-[#4A3518] hover:text-[#D9CCB4]"
                 >
                   View all projects
                 </Button>
@@ -49,14 +49,14 @@ export default async function Home() {
               <Button
                 type="submit"
                 size="lg"
-                className="bg-violet-600 hover:bg-violet-500 text-white"
+                className="bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]"
               >
                 Get started with Google
               </Button>
             </form>
           )}
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-[#7A7A78]">
           No spreadsheet setup. No code required.
         </p>
       </div>

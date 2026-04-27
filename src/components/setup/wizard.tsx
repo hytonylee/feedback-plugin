@@ -77,30 +77,30 @@ export default function SetupWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
-      <Card className="w-full max-w-lg bg-slate-900 border-slate-700 text-white">
+    <div className="min-h-screen bg-[#2B1F0E] flex items-center justify-center p-6">
+      <Card className="w-full max-w-lg bg-[#40331C] border-[#5C4520] text-[#D9CCB4]">
         {step === "name" && (
           <>
             <CardHeader>
-              <CardTitle className="text-xl">Name your project</CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardTitle className="text-xl text-[#D9CCB4]">Name your project</CardTitle>
+              <CardDescription className="text-[#A5A6A4]">
                 This is what your team will see on the dashboard.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-slate-300">Project name</Label>
+                <Label htmlFor="name" className="text-[#C4B898]">Project name</Label>
                 <Input
                   id="name"
                   placeholder="e.g. Acme App v2 Feedback"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && projectName && setStep("categories")}
-                  className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-[#4A3518] border-[#7A5D30] text-[#D9CCB4] placeholder:text-[#7A7A78]"
                 />
               </div>
               <Button
-                className="w-full bg-violet-600 hover:bg-violet-500"
+                className="w-full bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]"
                 disabled={!projectName.trim()}
                 onClick={() => setStep("categories")}
               >
@@ -113,8 +113,8 @@ export default function SetupWizard() {
         {step === "categories" && (
           <>
             <CardHeader>
-              <CardTitle className="text-xl">Feedback categories</CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardTitle className="text-xl text-[#D9CCB4]">Feedback categories</CardTitle>
+              <CardDescription className="text-[#A5A6A4]">
                 Users will pick one category per submission.
               </CardDescription>
             </CardHeader>
@@ -124,7 +124,7 @@ export default function SetupWizard() {
                   <Badge
                     key={c}
                     variant="secondary"
-                    className="cursor-pointer bg-slate-700 hover:bg-red-900/50 text-slate-200"
+                    className="cursor-pointer bg-[#4A3518] hover:bg-red-900/50 text-[#C4B898]"
                     onClick={() => setCategories(categories.filter((x) => x !== c))}
                   >
                     {c} ×
@@ -137,18 +137,18 @@ export default function SetupWizard() {
                   value={catInput}
                   onChange={(e) => setCatInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addCategory()}
-                  className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-[#4A3518] border-[#7A5D30] text-[#D9CCB4] placeholder:text-[#7A7A78]"
                 />
-                <Button variant="outline" onClick={addCategory} className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                <Button variant="outline" onClick={addCategory} className="border-[#7A5D30] text-[#C4B898] hover:bg-[#4A3518]">
                   Add
                 </Button>
               </div>
               <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => setStep("name")} className="text-slate-400">
+                <Button variant="ghost" onClick={() => setStep("name")} className="text-[#A5A6A4]">
                   ← Back
                 </Button>
                 <Button
-                  className="flex-1 bg-violet-600 hover:bg-violet-500"
+                  className="flex-1 bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]"
                   disabled={categories.length === 0}
                   onClick={() => setStep("tags")}
                 >
@@ -162,21 +162,21 @@ export default function SetupWizard() {
         {step === "tags" && (
           <>
             <CardHeader>
-              <CardTitle className="text-xl">Tags</CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardTitle className="text-xl text-[#D9CCB4]">Tags</CardTitle>
+              <CardDescription className="text-[#A5A6A4]">
                 Configure labels and choose which fields are required on the form.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg border border-slate-700 bg-slate-800/60 p-3 space-y-3">
+              <div className="rounded-lg border border-[#5C4520] bg-[#4A3518]/60 p-3 space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm text-slate-200">Tags field</p>
-                    <p className="text-xs text-slate-400">Require users to pick at least one tag.</p>
+                    <p className="text-sm text-[#C4B898]">Tags field</p>
+                    <p className="text-xs text-[#A5A6A4]">Require users to pick at least one tag.</p>
                   </div>
                   <Button
                     variant={requirements.tagsRequired ? "default" : "outline"}
-                    className={requirements.tagsRequired ? "bg-violet-600 hover:bg-violet-500" : "border-slate-600 text-slate-300"}
+                    className={requirements.tagsRequired ? "bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]" : "border-[#7A5D30] text-[#C4B898] hover:bg-[#4A3518]"}
                     onClick={() =>
                       setRequirements((prev) => ({ ...prev, tagsRequired: !prev.tagsRequired }))
                     }
@@ -186,12 +186,12 @@ export default function SetupWizard() {
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm text-slate-200">Comment field</p>
-                    <p className="text-xs text-slate-400">Require users to include a written comment.</p>
+                    <p className="text-sm text-[#C4B898]">Comment field</p>
+                    <p className="text-xs text-[#A5A6A4]">Require users to include a written comment.</p>
                   </div>
                   <Button
                     variant={requirements.commentRequired ? "default" : "outline"}
-                    className={requirements.commentRequired ? "bg-violet-600 hover:bg-violet-500" : "border-slate-600 text-slate-300"}
+                    className={requirements.commentRequired ? "bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]" : "border-[#7A5D30] text-[#C4B898] hover:bg-[#4A3518]"}
                     onClick={() =>
                       setRequirements((prev) => ({
                         ...prev,
@@ -209,7 +209,7 @@ export default function SetupWizard() {
                   <Badge
                     key={t}
                     variant="outline"
-                    className="cursor-pointer border-slate-600 text-slate-300 hover:border-red-500"
+                    className="cursor-pointer border-[#7A5D30] text-[#C4B898] hover:border-red-500"
                     onClick={() => setTags(tags.filter((x) => x !== t))}
                   >
                     #{t} ×
@@ -222,24 +222,24 @@ export default function SetupWizard() {
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addTag()}
-                  className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-[#4A3518] border-[#7A5D30] text-[#D9CCB4] placeholder:text-[#7A7A78]"
                 />
-                <Button variant="outline" onClick={addTag} className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                <Button variant="outline" onClick={addTag} className="border-[#7A5D30] text-[#C4B898] hover:bg-[#4A3518]">
                   Add
                 </Button>
               </div>
-              <Separator className="bg-slate-700" />
+              <Separator className="bg-[#5C4520]" />
               {error && (
                 <div className="rounded-md border border-red-800 bg-red-950/40 px-3 py-2 text-sm text-red-300">
                   {error}
                 </div>
               )}
               <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => setStep("categories")} className="text-slate-400">
+                <Button variant="ghost" onClick={() => setStep("categories")} className="text-[#A5A6A4]">
                   ← Back
                 </Button>
                 <Button
-                  className="flex-1 bg-violet-600 hover:bg-violet-500"
+                  className="flex-1 bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]"
                   onClick={handleCreate}
                   disabled={loading}
                 >
@@ -254,27 +254,27 @@ export default function SetupWizard() {
           <>
             <CardHeader>
               <div className="text-2xl mb-1">🎉</div>
-              <CardTitle className="text-xl">Your form is ready</CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardTitle className="text-xl text-[#D9CCB4]">Your form is ready</CardTitle>
+              <CardDescription className="text-[#A5A6A4]">
                 Copy the embed code below and paste it anywhere on your site.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg bg-slate-800 p-3 text-xs text-slate-300 font-mono break-all border border-slate-700">
+              <div className="rounded-lg bg-[#4A3518] p-3 text-xs text-[#C4B898] font-mono break-all border border-[#5C4520]">
                 {embedCode}
               </div>
-              <Button className="w-full bg-violet-600 hover:bg-violet-500" onClick={copyEmbed}>
+              <Button className="w-full bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]" onClick={copyEmbed}>
                 {copied ? "Copied!" : "Copy embed code"}
               </Button>
-              <Separator className="bg-slate-700" />
+              <Separator className="bg-[#5C4520]" />
               <div className="flex flex-col gap-2">
                 <a href={`/form/${done.projectId}?sid=${done.spreadsheetId}&preview=1`} target="_blank" rel="noreferrer">
-                  <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
+                  <Button variant="outline" className="w-full border-[#7A5D30] text-[#C4B898] hover:bg-[#4A3518]">
                     Preview form
                   </Button>
                 </a>
                 <a href={`/dashboard/${done.projectId}?sid=${done.spreadsheetId}`}>
-                  <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
+                  <Button variant="outline" className="w-full border-[#7A5D30] text-[#C4B898] hover:bg-[#4A3518]">
                     Go to dashboard →
                   </Button>
                 </a>

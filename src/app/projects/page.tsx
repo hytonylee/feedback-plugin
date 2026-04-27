@@ -13,23 +13,23 @@ export default async function ProjectsPage() {
   const projects = await listUserProjects(session.accessToken)
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6">
+    <main className="min-h-screen bg-[#2B1F0E] text-[#D9CCB4] p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Your projects</h1>
-            <p className="text-slate-400 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-[#D9CCB4]">Your projects</h1>
+            <p className="text-[#A5A6A4] text-sm mt-1">
               Copy any direct form/dashboard link below.
             </p>
           </div>
           <Link href="/setup">
-            <Button className="bg-violet-600 hover:bg-violet-500">New project</Button>
+            <Button className="bg-[#733906] hover:bg-[#8A4508] text-[#D9CCB4]">New project</Button>
           </Link>
         </div>
 
         {projects.length === 0 ? (
-          <Card className="bg-slate-900 border-slate-800 text-white">
-            <CardContent className="py-10 text-slate-400 text-sm">
+          <Card className="bg-[#40331C] border-[#5C4520] text-[#D9CCB4]">
+            <CardContent className="py-10 text-[#A5A6A4] text-sm">
               No projects yet. Create your first project in setup.
             </CardContent>
           </Card>
@@ -41,24 +41,24 @@ export default async function ProjectsPage() {
               const formHref = `/form/${project.projectId}?sid=${sid}`
 
               return (
-                <Card key={project.projectId} className="bg-slate-900 border-slate-800 text-white">
+                <Card key={project.projectId} className="bg-[#40331C] border-[#5C4520] text-[#D9CCB4]">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{project.projectName}</CardTitle>
-                    <CardDescription className="text-slate-400">
+                    <CardTitle className="text-lg text-[#D9CCB4]">{project.projectName}</CardTitle>
+                    <CardDescription className="text-[#A5A6A4]">
                       projectId: <span className="font-mono">{project.projectId}</span>
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <div className="text-slate-300">
+                    <div className="text-[#C4B898]">
                       Form:{" "}
-                      <Link className="text-cyan-400 hover:text-cyan-300 break-all" href={formHref}>
+                      <Link className="text-[#D9A76A] hover:text-[#E5BF8E] break-all" href={formHref}>
                         {formHref}
                       </Link>
                     </div>
-                    <div className="text-slate-300">
+                    <div className="text-[#C4B898]">
                       Dashboard:{" "}
                       <Link
-                        className="text-violet-400 hover:text-violet-300 break-all"
+                        className="text-[#D9A76A] hover:text-[#E5BF8E] break-all"
                         href={dashboardHref}
                       >
                         {dashboardHref}
