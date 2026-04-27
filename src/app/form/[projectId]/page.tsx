@@ -12,9 +12,16 @@ export default async function FormPage({ params, searchParams }: Props) {
 
   if (!spreadsheetId) notFound()
 
+  const isPreview = preview === "1"
+
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <FeedbackForm projectId={projectId} spreadsheetId={spreadsheetId} preview={preview === "1"} />
+      <FeedbackForm
+        projectId={projectId}
+        spreadsheetId={spreadsheetId}
+        preview={isPreview}
+        dashboardUrl={isPreview ? `/dashboard/${projectId}?sid=${spreadsheetId}` : undefined}
+      />
     </div>
   )
 }

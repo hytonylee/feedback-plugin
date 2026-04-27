@@ -13,9 +13,10 @@ interface Props {
   projectId: string
   spreadsheetId: string
   preview?: boolean
+  dashboardUrl?: string
 }
 
-export default function FeedbackForm({ projectId, spreadsheetId, preview = false }: Props) {
+export default function FeedbackForm({ projectId, spreadsheetId, preview = false, dashboardUrl }: Props) {
   const [project, setProject] = useState<Project | null>(null)
   const [category, setCategory] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -97,8 +98,13 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
   return (
     <Card className="w-full max-w-md bg-slate-900 border-slate-700 text-white">
       {preview && (
-        <div className="rounded-t-lg bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-center text-xs text-amber-300">
-          Preview mode — submissions will not be saved
+        <div className="rounded-t-lg bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-2 text-xs text-amber-300">
+          <span>Preview mode — submissions will not be saved</span>
+          {dashboardUrl && (
+            <a href={dashboardUrl} className="underline underline-offset-2 whitespace-nowrap hover:text-amber-200">
+              ← Dashboard
+            </a>
+          )}
         </div>
       )}
       <CardHeader>
