@@ -15,7 +15,12 @@ interface DoneState {
   spreadsheetId: string
 }
 
-export default function SetupWizard() {
+interface SetupWizardProps {
+  editProjectId?: string
+  editSpreadsheetId?: string
+}
+
+export default function SetupWizard(_props: SetupWizardProps) {
   const [step, setStep] = useState<Step>("name")
   const [projectName, setProjectName] = useState("")
   const [categories, setCategories] = useState<string[]>(["Bug Report", "Feature Request", "Improvement", "Question"])
