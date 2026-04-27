@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+echo "Running preflight checks before push..."
+bun run preflight || exit 1
+
+if rg -q '"test"\\s*:' package.json; then
+  echo "Running tests..."
+  bun run test || exit 1
+else
+  echo "No test script found, skipping tests."
+fi
