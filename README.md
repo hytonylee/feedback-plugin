@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# feedback-plugin
 
-## Getting Started
+Google Workspace-integrated product feedback tool for non-technical PMs.
 
-First, run the development server:
+PMs create a project, configure categories/tags/requirements, and get a hosted iframe form. Submissions are written to Google Sheets, then a dashboard computes priority and visualizes what to build next.
+
+## Current workflow
+
+1. PM signs in with Google from `/`.
+2. PM runs the setup wizard at `/setup`:
+   - project name
+   - allowed categories
+   - allowed tags
+   - form requirements (tags/comment required)
+3. App creates a Google Spreadsheet with `config` + `responses` tabs and returns:
+   - `projectId` (public identifier)
+   - `spreadsheetId` (Google Sheet id)
+4. PM shares/embed uses form URL: `/form/[projectId]?sid=[spreadsheetId]`.
+5. Dashboard URL `/dashboard/[projectId]?sid=[spreadsheetId]` shows:
+   - ranked priorities
+   - category chart
+   - top tags
+6. `/projects` lists all discovered feedback sheets for the signed-in user and gives direct form/dashboard links.
+
+## Routes (implemented)
+
+### Pages
+
+- `/` - marketing + Google sign-in CTA
+- `/setup` - authenticated project setup wizard
+- `/projects` - authenticated project list with deep links
+- `/form/[projectId]` - public embeddable form UI
+- `/dashboard/[projectId]` - authenticated analytics dashboard
+
+### API routes
+
+- `POST /api/setup`
+  - creates a project sheet and writes config metadata
+  - response: `{ projectId, spreadsheetId }`
+- `GET /api/project/[projectId]?sid=...`
+  - returns parsed project config for form/dashboard
+- `POST /api/feedback/[projectId]`
+  - appends feedback row to `responses` tab
+- `GET /api/projects`
+  - returns current user's project summaries from Drive + config tab
+- `/api/auth/[...nextauth]`
+  - NextAuth handlers
+
+## Data model in Google Sheets
+
+Each project creates one spreadsheet with two tabs:
+
+- `config` tab
+  - columns: `projectId | projectName | categories | tags | createdAt | requirements`
+  - row 2 stores JSON for `categories`, `tags`, and `requirements`
+- `responses` tab
+  - columns: `timestamp | category | tags | comment | sessionId`
+  - append-only
+
+## Priority logic
+
+Dashboard scoring uses:
+
+`score = (count * 1.0) + (unique_tag_count * 0.5) + (submissions_last_7_days * 0.3)`
+
+## Tech stack
+
+- Next.js 16 (App Router)
+- React 19
+- NextAuth (Google OAuth)
+- Google Sheets API + Google Drive API
+- shadcn/ui + Tailwind CSS
+- Recharts
+- Bun (package manager/scripts)
+
+## Local development
+
+Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
+```
+
+Start dev server:
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run checks:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+bun run security:audit
+bun lint
+bun run preflight
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Build production bundle:
 
-## Learn More
+```bash
+bun build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Auth and Google setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Configure Google OAuth for NextAuth with Sheets + Drive access, then set required auth/env values in your local environment (for example via `.env.local`) before running the app.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+OAuth scopes used by the app:
 
-## Deploy on Vercel
+- `openid`
+- `email`
+- `profile`
+- `https://www.googleapis.com/auth/spreadsheets`
+- `https://www.googleapis.com/auth/drive.file`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Embedding
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Use a hosted iframe pointing at:
+
+```html
+<iframe src="https://your-domain.com/form/[projectId]?sid=[spreadsheetId]" />
+```
+
+No custom script snippet is required.
