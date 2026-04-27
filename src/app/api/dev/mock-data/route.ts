@@ -83,6 +83,23 @@ function randomProjectTitle(): string {
   return `${adj} ${noun}`
 }
 
+const DESCRIPTION_POOL = [
+  "Dogfood embed on the staging site — route bugs and UX friction here for the Feb release.",
+  "Partner beta: capture what blocks rollout and tag urgent if it breaks core flows.",
+  "Weekly CS triage dump; link to Linear is in the dashboard. Context beats one-liners.",
+  "Mobile-first review for the redesign. Mention device and OS when something feels off.",
+  "Collecting onboarding feedback before we freeze copy. Screenshots welcome.",
+  "Internal QA pass for billing — no PII in comments, use session IDs only.",
+  "Hack week feedback bucket: wild ideas encouraged, tag nice-to-have if low priority.",
+  "Accessibility sweep — flag contrast, focus order, and screen reader issues.",
+  "Performance regressions after the CDN cutover. Include slow URLs and repro steps.",
+  "Marketing site only; product app bugs go to the other project.",
+]
+
+function randomProjectDescription(): string {
+  return DESCRIPTION_POOL[Math.floor(Math.random() * DESCRIPTION_POOL.length)]!
+}
+
 /** Local development only: creates sample spreadsheets + responses. */
 export async function POST() {
   if (process.env.NODE_ENV !== "development") {
@@ -105,6 +122,7 @@ export async function POST() {
     const spreadsheetId = await createProjectSheet(session.accessToken, {
       projectId,
       projectName: randomProjectTitle(),
+      description: randomProjectDescription(),
       categories,
       tags,
       requirements: {

@@ -86,9 +86,17 @@ export async function createProjectSheet(
       valueInputOption: "RAW",
       data: [
         {
-          range: "config!A1:F2",
+          range: "config!A1:G2",
           values: [
-            ["projectId", "projectName", "categories", "tags", "createdAt", "requirements"],
+            [
+              "projectId",
+              "projectName",
+              "categories",
+              "tags",
+              "createdAt",
+              "requirements",
+              "description",
+            ],
             [
               project.projectId,
               project.projectName,
@@ -96,6 +104,7 @@ export async function createProjectSheet(
               JSON.stringify(project.tags),
               createdAt,
               JSON.stringify(project.requirements),
+              project.description ?? "",
             ],
           ],
         },
@@ -110,11 +119,11 @@ export async function createProjectSheet(
   return spreadsheetId
 }
 
-/** Updates config row B–D and F; preserves projectId (A) and createdAt (E). Optionally renames the Drive file. */
+/** Updates config row B–D, F–G; preserves projectId (A) and createdAt (E). Optionally renames the Drive file. */
 export async function updateProjectConfig(
   accessToken: string,
   spreadsheetId: string,
-  updates: Pick<Project, "projectName" | "categories" | "tags" | "requirements">
+  updates: Pick<Project, "projectName" | "categories" | "tags" | "requirements" | "description">
 ): Promise<void> {
   const sheets = getSheetsClient(accessToken)
   const drive = getDriveClient(accessToken)
@@ -135,8 +144,8 @@ export async function updateProjectConfig(
           ],
         },
         {
-          range: "config!F2",
-          values: [[JSON.stringify(updates.requirements)]],
+          range: "config!F2:G2",
+          values: [[JSON.stringify(updates.requirements), updates.description ?? ""]],
         },
       ],
     },
@@ -158,7 +167,7 @@ export async function getProjectConfig(
   const res = await withRetry(() =>
     sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "config!A2:F2",
+      range: "config!A2:G2",
     })
   )
   const [row] = res.data.values ?? []
@@ -173,6 +182,7 @@ export async function getProjectConfig(
     requirements,
     spreadsheetId,
     createdAt: row[4],
+    description: typeof row?.[6] === "string" ? row[6] : "",
   }
 }
 
@@ -230,7 +240,11 @@ export async function getAllFeedback(
 
 export async function listUserProjects(
   accessToken: string
-): Promise<Array<Pick<Project, "projectId" | "projectName" | "spreadsheetId" | "createdAt">>> {
+): Promise<
+    Array<
+      Pick<Project, "projectId" | "projectName" | "description" | "spreadsheetId" | "createdAt">
+    >
+  > {
   const drive = getDriveClient(accessToken)
   const filesRes = await drive.files.list({
     q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and name contains 'Feedback:'",
@@ -239,7 +253,9 @@ export async function listUserProjects(
   })
 
   const files = filesRes.data.files ?? []
-  const projects: Array<Pick<Project, "projectId" | "projectName" | "spreadsheetId" | "createdAt">> = []
+  const projects: Array<
+    Pick<Project, "projectId" | "projectName" | "description" | "spreadsheetId" | "createdAt">
+  > = []
 
   for (const file of files) {
     if (!file.id) continue
@@ -249,6 +265,7 @@ export async function listUserProjects(
       projects.push({
         projectId: project.projectId,
         projectName: project.projectName,
+        description: project.description ?? "",
         spreadsheetId: project.spreadsheetId,
         createdAt: project.createdAt ?? file.createdTime ?? new Date().toISOString(),
       })

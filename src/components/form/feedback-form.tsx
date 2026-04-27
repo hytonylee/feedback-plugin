@@ -109,7 +109,11 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
       )}
       <CardHeader>
         <CardTitle className="text-lg text-foreground">{project.projectName}</CardTitle>
-        <CardDescription className="text-muted-foreground">Share your feedback with the team.</CardDescription>
+        <CardDescription className="text-muted-foreground whitespace-pre-wrap">
+          {project.description.trim()
+            ? project.description
+            : "Share your feedback with the team."}
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">

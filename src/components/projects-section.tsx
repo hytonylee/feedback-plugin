@@ -24,6 +24,7 @@ export type ProjectFilterMeta = {
 type ProjectRow = {
   projectId: string
   projectName: string
+  description: string
   spreadsheetId: string
 }
 
@@ -222,6 +223,11 @@ export function ProjectsSection({
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 space-y-1">
                       <CardTitle className="text-lg">{project.projectName}</CardTitle>
+                      {project.description.trim() ? (
+                        <p className="text-sm text-muted-foreground line-clamp-4 whitespace-pre-wrap">
+                          {project.description}
+                        </p>
+                      ) : null}
                       <CardDescription className="text-muted-foreground">
                         projectId: <span className="font-mono">{project.projectId}</span>
                       </CardDescription>

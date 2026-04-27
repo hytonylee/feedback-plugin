@@ -47,6 +47,7 @@ export async function PATCH(
 
   const body = await req.json().catch(() => null)
   const projectName = typeof body?.projectName === "string" ? body.projectName.trim() : ""
+  const description = typeof body?.description === "string" ? body.description : ""
   const categories = body?.categories
   const tags = body?.tags
   const requirements = body?.requirements
@@ -63,6 +64,7 @@ export async function PATCH(
 
     await updateProjectConfig(session.accessToken, spreadsheetId, {
       projectName,
+      description,
       categories: categories.map(String),
       tags: Array.isArray(tags) ? tags.map(String) : [],
       requirements: {

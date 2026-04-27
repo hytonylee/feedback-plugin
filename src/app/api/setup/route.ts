@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { projectName, categories, tags, requirements } = await req.json()
+  const { projectName, description, categories, tags, requirements } = await req.json()
   if (!projectName || !categories?.length) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
   }
@@ -18,6 +18,7 @@ export async function POST(req: Request) {
   const spreadsheetId = await createProjectSheet(session.accessToken, {
     projectId,
     projectName,
+    description: typeof description === "string" ? description : "",
     categories,
     tags: tags ?? [],
     requirements: {

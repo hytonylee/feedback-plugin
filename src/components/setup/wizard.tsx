@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -28,6 +29,7 @@ export default function SetupWizard({
 
   const [step, setStep] = useState<Step>("name")
   const [projectName, setProjectName] = useState("")
+  const [projectDescription, setProjectDescription] = useState("")
   const [categories, setCategories] = useState<string[]>(["Bug Report", "Feature Request", "Improvement", "Question"])
   const [tags, setTags] = useState<string[]>(["urgent", "nice-to-have", "ux", "performance", "mobile"])
   const [catInput, setCatInput] = useState("")
@@ -36,10 +38,58 @@ export default function SetupWizard({
     tagsRequired: false,
     commentRequired: false,
   })
+  const [editLoadState, setEditLoadState] = useState<"loading" | "ok" | "error">(
+    isEditMode ? "loading" : "ok"
+  )
+  const [editLoadError, setEditLoadError] = useState<string | null>(null)
+  const [editConfigRetryKey, setEditConfigRetryKey] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState<DoneState | null>(null)
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!editProjectId || !editSpreadsheetId) return
+
+    let cancelled = false
+    const load = async () => {
+      setEditLoadState("loading")
+      setEditLoadError(null)
+      try {
+        const res = await fetch(
+          `/api/project/${encodeURIComponent(editProjectId)}?sid=${encodeURIComponent(editSpreadsheetId)}`
+        )
+        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(typeof data?.error === "string" ? data.error : "Could not load project")
+        }
+        if (cancelled) return
+        setProjectName(data.projectName ?? "")
+        setProjectDescription(
+          typeof data.description === "string" ? data.description : ""
+        )
+        setCategories(
+          Array.isArray(data.categories) && data.categories.length > 0
+            ? data.categories
+            : ["Bug Report", "Feature Request", "Improvement", "Question"]
+        )
+        setTags(Array.isArray(data.tags) ? data.tags : [])
+        setRequirements({
+          tagsRequired: Boolean(data.requirements?.tagsRequired),
+          commentRequired: Boolean(data.requirements?.commentRequired),
+        })
+        setEditLoadState("ok")
+      } catch (e) {
+        if (cancelled) return
+        setEditLoadState("error")
+        setEditLoadError(e instanceof Error ? e.message : "Could not load project")
+      }
+    }
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [editProjectId, editSpreadsheetId, editConfigRetryKey])
 
   const addCategory = () => {
     const val = catInput.trim()
@@ -53,21 +103,54 @@ export default function SetupWizard({
     setTagInput("")
   }
 
-  const handleCreate = async () => {
+  const handleSubmit = async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch("/api/setup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectName, categories, tags, requirements }),
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setDone(data)
-        setStep("done")
+      if (isEditMode && editProjectId && editSpreadsheetId) {
+        const res = await fetch(
+          `/api/project/${encodeURIComponent(editProjectId)}?sid=${encodeURIComponent(editSpreadsheetId)}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              projectName,
+              description: projectDescription,
+              categories,
+              tags,
+              requirements,
+            }),
+          }
+        )
+        const data = await res.json()
+        if (res.ok) {
+          setDone({
+            projectId: data.projectId ?? editProjectId,
+            spreadsheetId: data.spreadsheetId ?? editSpreadsheetId,
+          })
+          setStep("done")
+        } else {
+          setError(data?.error ?? "Failed to update form. Please try again.")
+        }
       } else {
-        setError(data?.error ?? "Failed to create form. Please try again.")
+        const res = await fetch("/api/setup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectName,
+            description: projectDescription,
+            categories,
+            tags,
+            requirements,
+          }),
+        })
+        const data = await res.json()
+        if (res.ok) {
+          setDone(data)
+          setStep("done")
+        } else {
+          setError(data?.error ?? "Failed to create form. Please try again.")
+        }
       }
     } catch {
       setError("Could not reach the server. Please check your connection and try again.")
@@ -102,24 +185,64 @@ export default function SetupWizard({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground">Project name</Label>
-                <Input
-                  id="name"
-                  placeholder="e.g. Acme App v2 Feedback"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && projectName && setStep("categories")}
-                  className="bg-background border-border text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
-              <Button
-                className="w-full bg-primary hover:bg-secondary text-primary-foreground"
-                disabled={!projectName.trim()}
-                onClick={() => setStep("categories")}
-              >
-                Continue →
-              </Button>
+              {isEditMode && editLoadState === "loading" ? (
+                <p className="text-sm text-muted-foreground">Loading project…</p>
+              ) : isEditMode && editLoadState === "error" ? (
+                <div className="space-y-3">
+                  <div className="rounded-md border border-red-800 bg-red-950/40 px-3 py-2 text-sm text-red-300">
+                    {editLoadError ?? "Could not load project"}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full border-border"
+                    onClick={() => setEditConfigRetryKey((k) => k + 1)}
+                  >
+                    Try again
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-foreground">Project name</Label>
+                    <Input
+                      id="name"
+                      placeholder="e.g. Acme App v2 Feedback"
+                      value={projectName}
+                      onChange={(e) => setProjectName(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" &&
+                        projectName.trim() &&
+                        editLoadState === "ok" &&
+                        setStep("categories")
+                      }
+                      disabled={isEditMode && editLoadState !== "ok"}
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-foreground">
+                      Description <span className="text-muted-foreground font-normal">(optional)</span>
+                    </Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Short note for your team — shown on your projects list and the public form."
+                      value={projectDescription}
+                      onChange={(e) => setProjectDescription(e.target.value)}
+                      disabled={isEditMode && editLoadState !== "ok"}
+                      rows={3}
+                      className="resize-y min-h-[80px] bg-background border-border text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <Button
+                    className="w-full bg-primary hover:bg-secondary text-primary-foreground"
+                    disabled={!projectName.trim() || (isEditMode && editLoadState !== "ok")}
+                    onClick={() => setStep("categories")}
+                  >
+                    Continue →
+                  </Button>
+                </>
+              )}
             </CardContent>
           </>
         )}
@@ -254,10 +377,16 @@ export default function SetupWizard({
                 </Button>
                 <Button
                   className="flex-1 bg-primary hover:bg-secondary text-primary-foreground"
-                  onClick={handleCreate}
+                  onClick={handleSubmit}
                   disabled={loading}
                 >
-                  {loading ? "Creating…" : "Create form →"}
+                  {loading
+                    ? isEditMode
+                      ? "Saving…"
+                      : "Creating…"
+                    : isEditMode
+                      ? "Save changes →"
+                      : "Create form →"}
                 </Button>
               </div>
             </CardContent>
@@ -267,10 +396,14 @@ export default function SetupWizard({
         {step === "done" && done && (
           <>
             <CardHeader>
-              <div className="text-2xl mb-1">🎉</div>
-              <CardTitle className="text-xl text-foreground">Your form is ready</CardTitle>
+              <div className="text-2xl mb-1">{isEditMode ? "✓" : "🎉"}</div>
+              <CardTitle className="text-xl text-foreground">
+                {isEditMode ? "Changes saved" : "Your form is ready"}
+              </CardTitle>
               <CardDescription className="text-muted-foreground">
-                Copy the embed code below and paste it anywhere on your site.
+                {isEditMode
+                  ? "Your form settings were updated. Copy the embed code below if you need it."
+                  : "Copy the embed code below and paste it anywhere on your site."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

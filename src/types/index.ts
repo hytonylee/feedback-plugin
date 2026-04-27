@@ -1,6 +1,8 @@
 export interface Project {
   projectId: string
   projectName: string
+  /** Shown on the projects list card and optional context on the public form. */
+  description: string
   categories: string[]
   tags: string[]
   requirements: {
