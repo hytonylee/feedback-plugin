@@ -4,13 +4,45 @@ import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { computePortfolioStats, type PortfolioStats } from "@/lib/portfolio-stats"
 import { getAllFeedback, listUserProjects } from "@/lib/sheets"
+import type { FeedbackRow } from "@/types"
 import { AddMockDataButton } from "@/components/add-mock-data-button"
 import { RemoveAllProjectsButton } from "@/components/remove-all-projects-button"
-import { ProjectCardActions } from "@/components/project-card-actions"
+import {
+  ProjectsSection,
+  type ProjectFilterMeta,
+} from "@/components/projects-section"
 import { ProjectsPortfolioSummary } from "@/components/projects-portfolio-summary"
-import { RemoveProjectButton } from "@/components/remove-project-button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+
+function deriveProjectFilterMeta(
+  projects: { projectId: string }[],
+  feedbackByProject: FeedbackRow[][] | null
+): ProjectFilterMeta[] {
+  return projects.map((p, i) => {
+    const rows = feedbackByProject?.[i] ?? []
+    const categoriesInFeedback = [...new Set(rows.map((r) => r.category).filter(Boolean))]
+    const tagsInFeedback = [...new Set(rows.flatMap((r) => r.tags))]
+    return {
+      projectId: p.projectId,
+      categoriesInFeedback,
+      tagsInFeedback,
+    }
+  })
+}
+
+function portfolioFilterOptions(feedbackByProject: FeedbackRow[][] | null): {
+  allCategories: string[]
+  allTags: string[]
+} {
+  if (!feedbackByProject) return { allCategories: [], allTags: [] }
+  const rows = feedbackByProject.flat()
+  const allCategories = [...new Set(rows.map((r) => r.category).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b)
+  )
+  const allTags = [...new Set(rows.flatMap((r) => r.tags))].sort((a, b) => a.localeCompare(b))
+  return { allCategories, allTags }
+}
 
 function isSheetsQuotaError(error: unknown): boolean {
   if (!error || typeof error !== "object") return false
@@ -29,25 +61,31 @@ export default async function ProjectsPage() {
   const projects = await listUserProjects(session.accessToken)
 
   let portfolio: PortfolioStats | { quotaExceeded: true } | null = null
+  let feedbackByProject: FeedbackRow[][] | null = null
 
   if (projects.length > 0) {
     try {
-      const feedbackByProject = await Promise.all(
+      feedbackByProject = await Promise.all(
         projects.map((p) => getAllFeedback(session.accessToken, p.spreadsheetId))
       )
       portfolio = computePortfolioStats(feedbackByProject)
     } catch (error) {
       if (isSheetsQuotaError(error)) {
         portfolio = { quotaExceeded: true }
+        feedbackByProject = null
       } else {
         throw error
       }
     }
   }
 
+  const filterMeta = deriveProjectFilterMeta(projects, feedbackByProject)
+  const { allCategories, allTags } = portfolioFilterOptions(feedbackByProject)
+  const filterDataAvailable = feedbackByProject !== null
+
   return (
     <main className="min-h-screen bg-background text-foreground p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Your projects</h1>
@@ -91,46 +129,13 @@ export default async function ProjectsPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {projects.map((project) => {
-              const sid = project.spreadsheetId
-
-              return (
-                <Card key={project.projectId} className="border border-border bg-card text-foreground">
-                  <CardHeader className="pb-2 space-y-0">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-w-0 space-y-1">
-                        <CardTitle className="text-lg">{project.projectName}</CardTitle>
-                        <CardDescription className="text-muted-foreground">
-                          projectId: <span className="font-mono">{project.projectId}</span>
-                        </CardDescription>
-                      </div>
-                      <div className="flex flex-wrap gap-2 shrink-0">
-                        <Link href={`/setup?pid=${encodeURIComponent(project.projectId)}&sid=${encodeURIComponent(sid)}`}>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="border-border bg-background text-foreground hover:bg-secondary hover:text-primary-foreground"
-                          >
-                            Edit form
-                          </Button>
-                        </Link>
-                        <RemoveProjectButton
-                          projectId={project.projectId}
-                          spreadsheetId={sid}
-                          projectName={project.projectName}
-                        />
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <ProjectCardActions projectId={project.projectId} spreadsheetId={sid} />
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
+          <ProjectsSection
+            projects={projects}
+            filterMeta={filterMeta}
+            allCategories={allCategories}
+            allTags={allTags}
+            filterDataAvailable={filterDataAvailable}
+          />
         )}
       </div>
     </main>

@@ -15,7 +15,7 @@ type Props = {
 
 export function ProjectCardActions({ projectId, spreadsheetId }: Props) {
   const [copiedEmbed, setCopiedEmbed] = useState(false)
-  const [copiedPreviewLink, setCopiedPreviewLink] = useState(false)
+  const [copiedDistributionLink, setCopiedDistributionLink] = useState(false)
 
   const formHref = `/form/${projectId}?sid=${spreadsheetId}`
   const previewFormHref = `${formHref}&preview=1`
@@ -29,12 +29,13 @@ export function ProjectCardActions({ projectId, spreadsheetId }: Props) {
     setTimeout(() => setCopiedEmbed(false), 2000)
   }, [formHref])
 
-  const copyPreviewFormLink = useCallback(() => {
+  const copyDistributionLink = useCallback(() => {
     const origin = window.location.origin
-    void navigator.clipboard.writeText(`${origin}${previewFormHref}`)
-    setCopiedPreviewLink(true)
-    setTimeout(() => setCopiedPreviewLink(false), 2000)
-  }, [previewFormHref])
+    // Public form URL (same as embed iframe src) — submissions are saved; not preview mode
+    void navigator.clipboard.writeText(`${origin}${formHref}`)
+    setCopiedDistributionLink(true)
+    setTimeout(() => setCopiedDistributionLink(false), 2000)
+  }, [formHref])
 
   return (
     <div className="flex flex-wrap gap-2 pt-1">
@@ -52,10 +53,10 @@ export function ProjectCardActions({ projectId, spreadsheetId }: Props) {
         variant="outline"
         size="sm"
         className={outlineCard}
-        onClick={copyPreviewFormLink}
-        title="Copy URL that opens the form in preview mode (submissions not saved)"
+        onClick={copyDistributionLink}
+        title="Copy the public form URL to share with respondents (same as the embed form; submissions are saved)"
       >
-        {copiedPreviewLink ? "Copied!" : "Copy preview link"}
+        {copiedDistributionLink ? "Copied!" : "Copy distribution link"}
       </Button>
       <Button variant="outline" size="sm" className={outlineCard} nativeButton={false} render={<Link href={previewFormHref} target="_blank" rel="noopener noreferrer" />}>
         Form preview
