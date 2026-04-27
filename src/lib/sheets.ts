@@ -1,5 +1,86 @@
+import { JWT } from "google-auth-library"
 import { google } from "googleapis"
 import type { Project, FeedbackRow } from "@/types"
+
+type ServiceAccountCreds = { client_email: string; private_key: string }
+
+function parseServiceAccountJson(): ServiceAccountCreds | null {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON
+  if (!raw?.trim()) return null
+  try {
+    const j = JSON.parse(raw) as ServiceAccountCreds
+    if (typeof j.client_email !== "string" || typeof j.private_key !== "string") return null
+    return j
+  } catch {
+    return null
+  }
+}
+
+/** True when anonymous form GET/POST can use the Sheets API (JWT). */
+export function isPublicFormsAccessConfigured(): boolean {
+  return parseServiceAccountJson() !== null
+}
+
+function getSheetsClientServiceAccount() {
+  const creds = parseServiceAccountJson()
+  if (!creds) return null
+  const jwt = new JWT({
+    email: creds.client_email,
+    key: creds.private_key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  })
+  return google.sheets({ version: "v4", auth: jwt })
+}
+
+/**
+ * Use the signed-in user's OAuth token, or the server service account when
+ * `accessToken` is null/undefined (anonymous visitors to the public form).
+ */
+function resolveSheetsClient(accessToken: string | null | undefined) {
+  if (accessToken) {
+    return getSheetsClient(accessToken)
+  }
+  const sa = getSheetsClientServiceAccount()
+  if (!sa) {
+    const err = new Error(
+      "Public form access requires GOOGLE_SERVICE_ACCOUNT_JSON on the server."
+    ) as Error & { code?: string }
+    err.code = "PUBLIC_FORMS_NOT_CONFIGURED"
+    throw err
+  }
+  return sa
+}
+
+/** Grants the server service account writer access so anonymous users can read config and append rows. */
+export async function ensureServiceAccountWriterOnSpreadsheet(
+  ownerAccessToken: string,
+  spreadsheetId: string
+): Promise<void> {
+  const creds = parseServiceAccountJson()
+  if (!creds) return
+
+  const drive = getDriveClient(ownerAccessToken)
+  const { data } = await drive.permissions.list({
+    fileId: spreadsheetId,
+    fields: "permissions(emailAddress,role)",
+  })
+  const hasWriter = data.permissions?.some(
+    (p) =>
+      p.emailAddress === creds.client_email &&
+      (p.role === "writer" || p.role === "fileOrganizer" || p.role === "owner")
+  )
+  if (hasWriter) return
+
+  await drive.permissions.create({
+    fileId: spreadsheetId,
+    requestBody: {
+      type: "user",
+      role: "writer",
+      emailAddress: creds.client_email,
+    },
+    sendNotificationEmail: false,
+  })
+}
 
 function getSheetsClient(accessToken: string) {
   const auth = new google.auth.OAuth2()
@@ -116,6 +197,8 @@ export async function createProjectSheet(
     },
   })
 
+  await ensureServiceAccountWriterOnSpreadsheet(accessToken, spreadsheetId)
+
   return spreadsheetId
 }
 
@@ -157,13 +240,15 @@ export async function updateProjectConfig(
       requestBody: { name: `Feedback: ${updates.projectName}` },
     })
   )
+
+  await ensureServiceAccountWriterOnSpreadsheet(accessToken, spreadsheetId)
 }
 
 export async function getProjectConfig(
-  accessToken: string,
+  accessToken: string | null | undefined,
   spreadsheetId: string
 ): Promise<Project> {
-  const sheets = getSheetsClient(accessToken)
+  const sheets = resolveSheetsClient(accessToken)
   const res = await withRetry(() =>
     sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -187,12 +272,12 @@ export async function getProjectConfig(
 }
 
 export async function appendFeedbackBatch(
-  accessToken: string,
+  accessToken: string | null | undefined,
   spreadsheetId: string,
   rows: FeedbackRow[]
 ) {
   if (rows.length === 0) return
-  const sheets = getSheetsClient(accessToken)
+  const sheets = resolveSheetsClient(accessToken)
   await sheets.spreadsheets.values.append({
     spreadsheetId,
     range: "responses!A:E",
@@ -211,7 +296,7 @@ export async function appendFeedbackBatch(
 }
 
 export async function appendFeedback(
-  accessToken: string,
+  accessToken: string | null | undefined,
   spreadsheetId: string,
   row: FeedbackRow
 ) {

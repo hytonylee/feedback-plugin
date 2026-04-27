@@ -17,6 +17,7 @@ export default async function FormPage({ params, searchParams }: Props) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <FeedbackForm
+        key={`${projectId}-${spreadsheetId}-${isPreview ? "p" : "live"}`}
         projectId={projectId}
         spreadsheetId={spreadsheetId}
         preview={isPreview}

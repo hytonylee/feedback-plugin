@@ -14,18 +14,34 @@ export async function GET(
     return NextResponse.json({ error: "Missing sid" }, { status: 400 })
   }
 
-  // For public form access: try session token, fall back to public read if sheet is shared
   const session = await auth()
-  if (!session?.accessToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  const accessToken = session?.accessToken ?? null
 
-  const project = await getProjectConfig(session.accessToken, spreadsheetId)
-  if (project.projectId !== projectId) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 })
-  }
+  try {
+    const project = await getProjectConfig(accessToken, spreadsheetId)
+    if (project.projectId !== projectId) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 })
+    }
 
-  return NextResponse.json(project)
+    return NextResponse.json(project)
+  } catch (error) {
+    const code =
+      error && typeof error === "object" && "code" in error
+        ? (error as { code?: string }).code
+        : undefined
+    if (code === "PUBLIC_FORMS_NOT_CONFIGURED") {
+      return NextResponse.json(
+        {
+          error:
+            "Public forms are not enabled on this server yet (missing GOOGLE_SERVICE_ACCOUNT_JSON).",
+          code,
+        },
+        { status: 503 }
+      )
+    }
+    const message = error instanceof Error ? error.message : "Failed to load project"
+    return NextResponse.json({ error: message }, { status: 502 })
+  }
 }
 
 export async function PATCH(

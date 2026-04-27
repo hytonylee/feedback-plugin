@@ -18,6 +18,8 @@ interface Props {
 
 export default function FeedbackForm({ projectId, spreadsheetId, preview = false, dashboardUrl }: Props) {
   const [project, setProject] = useState<Project | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [category, setCategory] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [comment, setComment] = useState("")
@@ -29,11 +31,23 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
   useEffect(() => {
     fetch(`/api/project/${projectId}?sid=${spreadsheetId}`)
       .then(async (r) => {
-        if (!r.ok) throw new Error("Failed to load project")
-        return r.json()
+        const data = (await r.json().catch(() => null)) as { error?: string } | null
+        if (!r.ok) {
+          const msg =
+            data && typeof data.error === "string"
+              ? data.error
+              : r.status === 503
+                ? "This form is temporarily unavailable."
+                : "Could not load this form."
+          throw new Error(msg)
+        }
+        return data as Project
       })
       .then(setProject)
-      .catch(() => setStatus("error"))
+      .catch((e: unknown) => {
+        setLoadError(e instanceof Error ? e.message : "Could not load this form.")
+        setStatus("error")
+      })
   }, [projectId, spreadsheetId])
 
   const toggleTag = (tag: string) => {
@@ -48,6 +62,7 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
       setStatus("done")
       return
     }
+    setSubmitError(null)
     setStatus("loading")
     const res = await fetch(`/api/feedback/${projectId}`, {
       method: "POST",
@@ -59,7 +74,17 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
         spreadsheetId,
       }),
     })
-    setStatus(res.ok ? "done" : "error")
+    if (res.ok) {
+      setStatus("done")
+      return
+    }
+    const data = (await res.json().catch(() => null)) as { error?: string } | null
+    const msg =
+      data && typeof data.error === "string"
+        ? data.error
+        : "Something went wrong. Please try again."
+    setSubmitError(msg)
+    setStatus("idle")
   }
 
   if (status === "error" && !project) {
@@ -67,7 +92,7 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
       <Card className="w-full max-w-md border border-border bg-card text-foreground">
         <CardContent className="py-12 text-center space-y-2">
           <p className="font-medium text-foreground">Unable to load this form</p>
-          <p className="text-sm text-muted-foreground">Please confirm you are signed in and try again.</p>
+          <p className="text-sm text-muted-foreground">{loadError ?? "Please try again later."}</p>
         </CardContent>
       </Card>
     )
@@ -189,9 +214,9 @@ export default function FeedbackForm({ projectId, spreadsheetId, preview = false
           {status === "loading" ? "Submitting…" : "Submit feedback"}
         </Button>
 
-        {status === "error" && (
-          <p className="text-xs text-red-400 text-center">Something went wrong. Please try again.</p>
-        )}
+        {submitError ? (
+          <p className="text-xs text-red-400 text-center">{submitError}</p>
+        ) : null}
       </CardContent>
     </Card>
   )
