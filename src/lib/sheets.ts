@@ -110,6 +110,46 @@ export async function createProjectSheet(
   return spreadsheetId
 }
 
+/** Updates config row B–D and F; preserves projectId (A) and createdAt (E). Optionally renames the Drive file. */
+export async function updateProjectConfig(
+  accessToken: string,
+  spreadsheetId: string,
+  updates: Pick<Project, "projectName" | "categories" | "tags" | "requirements">
+): Promise<void> {
+  const sheets = getSheetsClient(accessToken)
+  const drive = getDriveClient(accessToken)
+
+  await sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      valueInputOption: "RAW",
+      data: [
+        {
+          range: "config!B2:D2",
+          values: [
+            [
+              updates.projectName,
+              JSON.stringify(updates.categories),
+              JSON.stringify(updates.tags),
+            ],
+          ],
+        },
+        {
+          range: "config!F2",
+          values: [[JSON.stringify(updates.requirements)]],
+        },
+      ],
+    },
+  })
+
+  await withRetry(() =>
+    drive.files.update({
+      fileId: spreadsheetId,
+      requestBody: { name: `Feedback: ${updates.projectName}` },
+    })
+  )
+}
+
 export async function getProjectConfig(
   accessToken: string,
   spreadsheetId: string
@@ -206,5 +246,16 @@ export async function listUserProjects(
 
   return projects.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+}
+
+/** Moves the spreadsheet to the user's Google Drive trash (removes form + dashboard for this project). */
+export async function trashProjectSpreadsheet(accessToken: string, spreadsheetId: string) {
+  const drive = getDriveClient(accessToken)
+  await withRetry(() =>
+    drive.files.update({
+      fileId: spreadsheetId,
+      requestBody: { trashed: true },
+    })
   )
 }
