@@ -158,7 +158,7 @@ export async function getProjectConfig(
   const res = await withRetry(() =>
     sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "config!A2:F2",
+      range: "config!A2:H2",
     })
   )
   const [row] = res.data.values ?? []
@@ -173,7 +173,25 @@ export async function getProjectConfig(
     requirements,
     spreadsheetId,
     createdAt: row[4],
+    aiSummary: row?.[6] ? JSON.parse(row[6]) : undefined,
+    aiSummaryGeneratedAt: row?.[7] ?? undefined,
   }
+}
+
+export async function saveAiSummary(
+  accessToken: string,
+  spreadsheetId: string,
+  summary: import("@/types").AiSummary
+): Promise<void> {
+  const sheets = getSheetsClient(accessToken)
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: "config!G2:H2",
+    valueInputOption: "RAW",
+    requestBody: {
+      values: [[JSON.stringify(summary), new Date().toISOString()]],
+    },
+  })
 }
 
 export async function appendFeedback(

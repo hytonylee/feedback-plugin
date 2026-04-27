@@ -1,3 +1,8 @@
+export interface AiSummary {
+  summary: string
+  suggestions: string[]
+}
+
 export interface Project {
   projectId: string
   projectName: string
@@ -9,6 +14,8 @@ export interface Project {
   }
   spreadsheetId: string
   createdAt: string
+  aiSummary?: AiSummary
+  aiSummaryGeneratedAt?: string
 }
 
 export interface FeedbackRow {
