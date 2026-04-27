@@ -36,11 +36,11 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       error.message.toLowerCase().includes("quota exceeded")
     ) {
       return (
-        <div className="min-h-screen bg-slate-950 text-white">
+        <div className="min-h-screen bg-[#2B1F0E] text-[#D9CCB4]">
           <div className="max-w-3xl mx-auto px-6 py-20">
-            <div className="rounded-xl border border-amber-700/40 bg-amber-950/30 p-6">
-              <h1 className="text-xl font-semibold text-amber-200">Google Sheets quota reached</h1>
-              <p className="mt-2 text-amber-100/80">
+            <div className="rounded-xl border border-[#D9A76A]/40 bg-[#733906]/20 p-6">
+              <h1 className="text-xl font-semibold text-[#D9A76A]">Google Sheets quota reached</h1>
+              <p className="mt-2 text-[#D9CCB4]/80">
                 Your dashboard is getting rate-limited by the Google Sheets API. Wait about a
                 minute and refresh.
               </p>
@@ -56,21 +56,21 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const priorities = computePriority(rows)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-[#2B1F0E] text-[#D9CCB4]">
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{project.projectName}</h1>
-            <p className="text-slate-400 text-sm mt-1">{rows.length} submissions total</p>
+            <h1 className="text-2xl font-bold text-[#D9CCB4]">{project.projectName}</h1>
+            <p className="text-[#A5A6A4] text-sm mt-1">{rows.length} submissions total</p>
           </div>
-          <Badge variant="outline" className="border-slate-600 text-slate-300 font-mono text-xs">
+          <Badge variant="outline" className="border-[#7A5D30] text-[#A5A6A4] font-mono text-xs">
             {projectId}
           </Badge>
         </div>
 
         {rows.length === 0 ? (
-          <div className="rounded-xl border border-slate-800 bg-slate-900 py-20 text-center text-slate-400">
-            <p className="text-lg font-medium text-white">No feedback yet</p>
+          <div className="rounded-xl border border-[#5C4520] bg-[#40331C] py-20 text-center text-[#A5A6A4]">
+            <p className="text-lg font-medium text-[#D9CCB4]">No feedback yet</p>
             <p className="text-sm mt-1">Share your form link to start collecting responses.</p>
           </div>
         ) : (
