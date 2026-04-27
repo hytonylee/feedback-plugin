@@ -12,9 +12,10 @@ import type { Project } from "@/types"
 interface Props {
   projectId: string
   spreadsheetId: string
+  preview?: boolean
 }
 
-export default function FeedbackForm({ projectId, spreadsheetId }: Props) {
+export default function FeedbackForm({ projectId, spreadsheetId, preview = false }: Props) {
   const [project, setProject] = useState<Project | null>(null)
   const [category, setCategory] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -42,6 +43,10 @@ export default function FeedbackForm({ projectId, spreadsheetId }: Props) {
 
   const handleSubmit = async () => {
     if (!project || !canSubmit) return
+    if (preview) {
+      setStatus("done")
+      return
+    }
     setStatus("loading")
     const res = await fetch(`/api/feedback/${projectId}`, {
       method: "POST",
@@ -80,8 +85,10 @@ export default function FeedbackForm({ projectId, spreadsheetId }: Props) {
       <Card className="w-full max-w-md bg-slate-900 border-slate-700 text-white">
         <CardContent className="py-12 text-center space-y-2">
           <div className="text-3xl">✓</div>
-          <p className="font-medium text-white">Feedback received!</p>
-          <p className="text-sm text-slate-400">Thanks for helping us improve.</p>
+          <p className="font-medium text-white">{preview ? "Preview looks great!" : "Feedback received!"}</p>
+          <p className="text-sm text-slate-400">
+            {preview ? "This was a preview — no data was saved." : "Thanks for helping us improve."}
+          </p>
         </CardContent>
       </Card>
     )
@@ -89,6 +96,11 @@ export default function FeedbackForm({ projectId, spreadsheetId }: Props) {
 
   return (
     <Card className="w-full max-w-md bg-slate-900 border-slate-700 text-white">
+      {preview && (
+        <div className="rounded-t-lg bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-center text-xs text-amber-300">
+          Preview mode — submissions will not be saved
+        </div>
+      )}
       <CardHeader>
         <CardTitle className="text-lg">{project.projectName}</CardTitle>
         <CardDescription className="text-slate-400">Share your feedback with the team.</CardDescription>

@@ -3,18 +3,18 @@ import FeedbackForm from "@/components/form/feedback-form"
 
 interface Props {
   params: Promise<{ projectId: string }>
-  searchParams: Promise<{ sid?: string }>
+  searchParams: Promise<{ sid?: string; preview?: string }>
 }
 
 export default async function FormPage({ params, searchParams }: Props) {
   const { projectId } = await params
-  const { sid: spreadsheetId } = await searchParams
+  const { sid: spreadsheetId, preview } = await searchParams
 
   if (!spreadsheetId) notFound()
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <FeedbackForm projectId={projectId} spreadsheetId={spreadsheetId} />
+      <FeedbackForm projectId={projectId} spreadsheetId={spreadsheetId} preview={preview === "1"} />
     </div>
   )
 }
